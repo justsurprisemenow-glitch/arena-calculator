@@ -58,6 +58,8 @@ html, body {
 
 /* ── Labels ── */
 .section-title { font-size: 10.5px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0 8px; }
+.section-title-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.section-sum { font-size: 14px; font-weight: 700; color: var(--color-text-primary); text-transform: none; letter-spacing: 0; }
 .sub-title { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 10px 0 6px; }
 
 /* ── Standard row ── */
@@ -147,7 +149,10 @@ h1.print-title { display: none; }
 .out-row .val { font-size: 11.5px; font-weight: 500; min-width: 78px; text-align: right; color: var(--color-text-secondary); }
 
 /* ── Metrics ── */
-.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 10px; margin: 20px 0 16px; }
+.metrics { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; margin: 20px 0 16px; }
+@media (max-width: 1100px) { .metrics { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 720px)  { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.metric .mval { font-size: 16px; }
 .metric { background: var(--color-background-secondary); border-radius: 8px; padding: 12px 14px; }
 .metric .mlabel { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
 .metric .mval { font-size: 18px; font-weight: 600; }
@@ -175,6 +180,171 @@ h1.print-title { display: none; }
 .status-bar.profit { background: #E1F5EE; color: #0F6E56; }
 .status-bar.loss { background: #FCEBEB; color: #A32D2D; }
 .status-bar.breakeven { background: #FAEEDA; color: #854F0B; }
+
+/* ── Top action bar ── */
+.top-actions { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+.btn-action {
+  font-size: 12px; font-weight: 500; padding: 5px 14px;
+  border-radius: 6px; border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-primary); color: var(--color-text-secondary);
+  cursor: pointer; transition: all 0.15s;
+}
+.btn-action:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.btn-action.copied { background: #E1F5EE; color: #0F6E56; border-color: #1D9E75; }
+
+/* ── Tooltip ── */
+.tip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 13px; height: 13px; font-size: 9px; font-weight: 600;
+  color: var(--color-text-tertiary); border: 1px solid var(--color-border-secondary);
+  border-radius: 50%; cursor: help; margin-left: 4px; position: relative;
+  flex-shrink: 0;
+}
+.tip:hover { color: #1D9E75; border-color: #1D9E75; }
+.tip[data-tip]:hover::after {
+  content: attr(data-tip);
+  position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);
+  background: #1A1A1A; color: #fff; font-size: 11px; font-weight: 400;
+  padding: 6px 10px; border-radius: 6px; white-space: normal; width: 240px;
+  z-index: 100; line-height: 1.4; pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.tip[data-tip]:hover::before {
+  content: ''; position: absolute; bottom: calc(100% + 2px); left: 50%; transform: translateX(-50%);
+  border: 4px solid transparent; border-top-color: #1A1A1A; z-index: 100;
+}
+
+/* ── Modified-from-preset indicator ── */
+.row.modified, .out-row.modified, .staff-row.modified, .count-row.modified {
+  position: relative;
+}
+.row.modified::before, .out-row.modified::before, .staff-row.modified::before, .count-row.modified::before {
+  content: ''; position: absolute; left: -10px; top: 4px; bottom: 4px; width: 2px;
+  background: #EF9F27; border-radius: 2px;
+}
+
+/* ── Collapsible blocks ── */
+.block-header { cursor: pointer; user-select: none; }
+.block-header:hover .toggle-caret { color: #1D9E75; }
+.block-header:hover .toggle-hint { color: #1D9E75; }
+.block-header .toggle-caret {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px; border-radius: 4px;
+  transition: transform 0.2s, background 0.15s; margin-right: 6px;
+  font-size: 12px; color: var(--color-text-secondary);
+  background: var(--color-background-primary);
+  border: 0.5px solid var(--color-border-secondary);
+  flex-shrink: 0;
+}
+.block-header .toggle-hint {
+  font-size: 10px; font-weight: 500; color: var(--color-text-tertiary);
+  text-transform: none; letter-spacing: 0; margin-left: 6px;
+}
+.section-block.collapsed .toggle-caret,
+.fot-block.collapsed .toggle-caret,
+.out-block.collapsed .toggle-caret { transform: rotate(-90deg); }
+.section-block.collapsed > *:not(.block-header),
+.fot-block.collapsed > *:not(.block-header),
+.out-block.collapsed > *:not(.block-header) { display: none; }
+
+/* ── Compact collapsible details (для верхнего сравнения сценариев) ── */
+.compact-details {
+  background: var(--color-background-secondary);
+  border-radius: 10px; padding: 0; margin: 10px 0;
+  overflow: hidden;
+}
+.compact-details summary {
+  cursor: pointer; padding: 10px 14px;
+  font-size: 12px; font-weight: 600; color: var(--color-text-primary);
+  outline: none; list-style: none; display: flex; align-items: center; gap: 6px;
+  user-select: none;
+}
+.compact-details summary::-webkit-details-marker { display: none; }
+.compact-details summary::after {
+  content: '▾'; margin-left: auto; font-size: 11px;
+  color: var(--color-text-tertiary); transition: transform 0.2s;
+}
+.compact-details[open] summary::after { transform: rotate(180deg); }
+.compact-details summary:hover { background: rgba(29, 158, 117, 0.06); }
+.compact-details[open] .cmp-table {
+  border-radius: 0 0 10px 10px; background: var(--color-background-primary);
+}
+
+/* ── Legend bar ── */
+.legend-bar {
+  display: flex; gap: 16px; align-items: center; flex-wrap: wrap;
+  font-size: 11px; color: var(--color-text-tertiary);
+  padding: 8px 12px; margin: 10px 0 4px;
+  background: var(--color-background-secondary); border-radius: 8px;
+}
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-swatch-modified {
+  width: 3px; height: 14px; background: #EF9F27; border-radius: 2px;
+}
+.legend-swatch-tip {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 13px; height: 13px; font-size: 9px; font-weight: 600;
+  color: var(--color-text-tertiary); border: 1px solid var(--color-border-secondary);
+  border-radius: 50%;
+}
+
+/* ── Scenario logic list ── */
+.logic-list p {
+  margin: 8px 0; font-size: 12px; line-height: 1.5;
+  color: var(--color-text-primary);
+}
+.logic-list b { color: var(--color-text-primary); font-weight: 600; }
+
+/* ── Scenario details (collapsible) ── */
+.scenario-details {
+  margin-top: 8px; padding-top: 8px; border-top: 0.5px dashed var(--color-border-secondary);
+}
+.scenario-details summary {
+  cursor: pointer; font-size: 11px; font-weight: 500; color: #1D9E75;
+  outline: none; list-style: none; display: inline-flex; align-items: center; gap: 4px;
+}
+.scenario-details summary::-webkit-details-marker { display: none; }
+.scenario-details summary::after { content: '▾'; font-size: 9px; transition: transform 0.2s; }
+.scenario-details[open] summary::after { transform: rotate(180deg); }
+.scenario-details .breakdown {
+  margin-top: 10px; display: grid; grid-template-columns: 1fr auto;
+  gap: 4px 16px; font-size: 11.5px;
+}
+.scenario-details .breakdown .item { color: var(--color-text-secondary); }
+.scenario-details .breakdown .amount { color: var(--color-text-primary); font-weight: 500; text-align: right; }
+.scenario-details .breakdown .sect {
+  grid-column: 1 / -1; font-size: 10px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--color-text-tertiary); margin-top: 6px;
+}
+.scenario-details .breakdown .total {
+  grid-column: 1 / -1; display: flex; justify-content: space-between;
+  font-weight: 700; padding-top: 6px; margin-top: 4px;
+  border-top: 0.5px solid var(--color-border-secondary);
+}
+
+/* ── Comparison table ── */
+.analytics-section { margin: 28px 0 8px; }
+.analytics-title {
+  font-size: 11px; font-weight: 600; color: var(--color-text-secondary);
+  text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px;
+}
+.cmp-table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+  background: var(--color-background-secondary); border-radius: 10px; overflow: hidden;
+}
+.cmp-table th, .cmp-table td {
+  padding: 9px 14px; text-align: right;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+}
+.cmp-table th:first-child, .cmp-table td:first-child { text-align: left; }
+.cmp-table th {
+  font-weight: 600; color: var(--color-text-secondary); font-size: 11px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+.cmp-table tr:last-child td { border-bottom: none; }
+.cmp-table .row-emphasis { font-weight: 700; background: var(--color-background-primary); }
+.cmp-table .profit-cell.pos { color: #0F6E56; font-weight: 600; }
+.cmp-table .profit-cell.neg { color: #A32D2D; font-weight: 600; }
 </style>
 </head>
 <body>
@@ -186,7 +356,11 @@ h1.print-title { display: none; }
 
 <div class="top-bar">
   <div></div>
-  <button class="btn-pdf" onclick="window.print()">⬇ Сохранить PDF</button>
+  <div class="top-actions">
+    <button class="btn-action" id="btn_share" onclick="copyShareLink()" title="Скопировать ссылку с текущими настройками">🔗 Ссылка</button>
+    <button class="btn-action" onclick="resetToScenario()" title="Сбросить к дефолту сценария">↺ Сброс</button>
+    <button class="btn-pdf" onclick="window.print()">⬇ PDF</button>
+  </div>
 </div>
 
 <!-- СЦЕНАРИИ -->
@@ -196,24 +370,44 @@ h1.print-title { display: none; }
   <button class="stab" onclick="setScenario('opt',this)">Оптимум</button>
 </div>
 <div class="scenario-info" id="scenario_info">
-  <strong>База</strong> — лиги (1.03 млн) и школы (640к) как в минимуме + заполнение дневного блока 10-16 на ~50% (тренировки/товарищеские/школа малышей — 500к) + турниры лиги (150к), школ (100к), корпоративы (250к). Кафе 400к оборот (COGS 42%). ВИП-ложи 2× на ивентах (300к). 2 администратора.
+  <div id="scenario_brief"><strong>База</strong> — полная загрузка ядра + дневной блок 10-16 на ~50% + турниры/корпоративы + кафе и ВИП-ложи.</div>
+  <details class="scenario-details">
+    <summary>Логика сценария — почему такие цифры</summary>
+    <div class="breakdown" id="scenario_breakdown"></div>
+  </details>
+</div>
+
+<details class="compact-details">
+  <summary>📊 Сравнить со всеми сценариями</summary>
+  <table class="cmp-table" id="cmp_table">
+    <thead>
+      <tr><th>Показатель</th><th>Минимум</th><th>База</th><th>Оптимум</th></tr>
+    </thead>
+    <tbody id="cmp_body"></tbody>
+  </table>
+</details>
+
+<div class="legend-bar">
+  <span class="legend-item"><span class="legend-swatch-modified"></span>оранжевая полоска — изменено от пресета</span>
+  <span class="legend-item"><span class="legend-swatch-tip">?</span>пояснение цифры</span>
+  <span class="legend-item">▾ клик по заголовку блока — свернуть</span>
 </div>
 
 <div class="two-col">
 
 <!-- ═ ДОХОДЫ ═ -->
 <div>
-  <div class="section-title">Доходы — ₽/мес</div>
+  <div class="section-title section-title-row"><span>Доходы — ₽/мес</span><span class="section-sum" id="sec_income_sum"></span></div>
 
-  <!-- Блок 1: Гарантированные -->
-  <div class="section-block">
+  <!-- ⚽ Аренда поля -->
+  <div class="section-block" data-keep-open="1">
     <div class="block-header">
-      <span class="block-label">🔒 Гарантированные по договору</span>
-      <span class="block-total" id="inc_g_total"></span>
+      <span class="block-label">⚽ Аренда поля</span>
+      <span class="block-total" id="inc_field_total"></span>
     </div>
     <div class="row">
       <label>Лиги<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">пн–пт 20–23 + сб–вс 9–23 · 6 000 ₽/ч</span></label>
-      <input type="range" min="0" max="3000000" step="10000" value="1032000" id="r_liga" oninput="calc()">
+      <input type="range" min="0" max="3000000" step="1000" value="1032000" id="r_liga" oninput="calc()">
       <span class="val" id="v_liga"></span>
     </div>
     <div class="row">
@@ -221,18 +415,18 @@ h1.print-title { display: none; }
       <input type="range" min="0" max="2500000" step="10000" value="640000" id="r_schools" oninput="calc()">
       <span class="val" id="v_schools"></span>
     </div>
-  </div>
-
-  <!-- Блок 2: Разовые / переменные -->
-  <div class="section-block">
-    <div class="block-header">
-      <span class="block-label">📅 Разовые / переменные</span>
-      <span class="block-total" id="inc_v_total"></span>
-    </div>
     <div class="row">
       <label>Тренировки / товарищеские<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">блок 10–16 · ~10 000 ₽/час · вкл. школу малышей</span></label>
       <input type="range" min="0" max="1200000" step="10000" value="500000" id="r_train" oninput="calc()">
       <span class="val" id="v_train"></span>
+    </div>
+  </div>
+
+  <!-- 🏆 Мероприятия -->
+  <div class="section-block">
+    <div class="block-header">
+      <span class="block-label">🏆 Мероприятия</span>
+      <span class="block-total" id="inc_events_total"></span>
     </div>
     <div class="row">
       <label><span class="cb-row"><input type="checkbox" id="cb_day_rent" onchange="calc()">Стадион на день</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">150–250 тыс./событие</span></label>
@@ -256,11 +450,11 @@ h1.print-title { display: none; }
     </div>
   </div>
 
-  <!-- Блок 3: Дополнительно -->
+  <!-- 💰 Коммерция -->
   <div class="section-block">
     <div class="block-header">
-      <span class="block-label">➕ Дополнительно</span>
-      <span class="block-total" id="inc_a_total"></span>
+      <span class="block-label">💰 Коммерция</span>
+      <span class="block-total" id="inc_commerce_total"></span>
     </div>
     <div class="row">
       <label><span class="cb-row"><input type="checkbox" id="cb_cafe" onchange="calc()" checked>Кафе — оборот</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">спорт-буфет: кофе/хот-доги/снеки/выпечка</span></label>
@@ -273,6 +467,16 @@ h1.print-title { display: none; }
       <span class="val" id="v_cafe_cogs"></span>
     </div>
     <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_vending" onchange="calc()" checked>Вендинг — оборот</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">снеки/напитки · 1–2 автомата</span></label>
+      <input type="range" min="0" max="500000" step="10000" value="150000" id="r_vending" oninput="calc()">
+      <span class="val" id="v_vending"></span>
+    </div>
+    <div class="row" id="vending_share_row">
+      <label style="font-size:11.5px;color:var(--color-text-secondary);padding-left:19px">└ Доля арене<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">по договору с поставщиком</span></label>
+      <input type="range" min="5" max="30" step="1" value="10" id="r_vending_share" oninput="calc()">
+      <span class="val" id="v_vending_share"></span>
+    </div>
+    <div class="row">
       <label><span class="cb-row"><input type="checkbox" id="cb_vip" onchange="calc()" checked>ВИП-ложи</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">2 ложи · аренда на ивенты</span></label>
       <input type="range" min="0" max="600000" step="10000" value="300000" id="r_vip" oninput="calc()">
       <span class="val" id="v_vip"></span>
@@ -281,6 +485,14 @@ h1.print-title { display: none; }
       <label><span class="cb-row"><input type="checkbox" id="cb_spaces" onchange="calc()">Аренда помещений</span></label>
       <input type="range" min="0" max="500000" step="10000" value="80000" id="r_spaces" oninput="calc()">
       <span class="val" id="v_spaces"></span>
+    </div>
+  </div>
+
+  <!-- 📢 Реклама -->
+  <div class="section-block">
+    <div class="block-header">
+      <span class="block-label">📢 Реклама</span>
+      <span class="block-total" id="inc_ads_total"></span>
     </div>
     <div class="row">
       <label><span class="cb-row"><input type="checkbox" id="cb_ads" onchange="calc()">Реклама / баннеры</span><span class="tag">обсуждается</span></label>
@@ -297,7 +509,7 @@ h1.print-title { display: none; }
 
 <!-- ═ РАСХОДЫ ═ -->
 <div>
-  <div class="section-title">Расходы — ₽/мес</div>
+  <div class="section-title section-title-row"><span>Расходы — ₽/мес</span><span class="section-sum" id="sec_costs_sum"></span></div>
 
   <!-- ФОТ -->
   <div class="fot-block">
@@ -330,12 +542,13 @@ h1.print-title { display: none; }
       <div class="count-btns" id="clean_btns">
         <button class="cbtn active" onclick="setCount('clean',2,this)">2</button>
         <button class="cbtn"        onclick="setCount('clean',3,this)">3</button>
+        <button class="cbtn"        onclick="setCount('clean',4,this)">4</button>
       </div>
       <span class="count-sub" id="clean_sub"></span>
     </div>
     <div class="staff-row">
       <label>Ставка одной уборщицы</label>
-      <input type="range" min="0" max="100000" step="2000" value="65000" id="e_clean_rate" oninput="calc()">
+      <input type="range" min="0" max="100000" step="1000" value="65000" id="e_clean_rate" oninput="calc()">
       <span class="val" id="ve_clean_rate"></span>
     </div>
 
@@ -356,6 +569,7 @@ h1.print-title { display: none; }
       <div class="count-btns" id="barista_btns">
         <button class="cbtn"        onclick="setCount('barista',1,this)">1</button>
         <button class="cbtn active" onclick="setCount('barista',2,this)">2</button>
+        <button class="cbtn"        onclick="setCount('barista',3,this)">3</button>
       </div>
       <span class="count-sub" id="barista_sub"></span>
     </div>
@@ -478,15 +692,19 @@ h1.print-title { display: none; }
 
 <div class="divider"></div>
 
-<!-- МЕТРИКИ -->
+<!-- МЕТРИКИ — одна полная строка под калькулятором -->
 <div class="metrics">
   <div class="metric neutral">
-    <div class="mlabel">Выручка</div>
+    <div class="mlabel">Доходы</div>
     <div class="mval" id="m_income"></div>
   </div>
   <div class="metric neutral">
     <div class="mlabel">Расходы</div>
     <div class="mval" id="m_costs"></div>
+  </div>
+  <div class="metric good">
+    <div class="mlabel">Чистая прибыль</div>
+    <div class="mval" id="m_profit"></div>
   </div>
   <div class="metric neutral">
     <div class="mlabel">
@@ -495,17 +713,14 @@ h1.print-title { display: none; }
     <div class="mval" id="m_tax"></div>
     <div style="font-size:10px;color:var(--color-text-tertiary);margin-top:3px" id="m_tax_note"></div>
   </div>
-  <div class="metric good">
-    <div class="mlabel">Чистая прибыль</div>
-    <div class="mval" id="m_profit"></div>
+  <div class="metric info">
+    <div class="mlabel">Маржинальность</div>
+    <div class="mval" id="m_margin"></div>
   </div>
   <div class="metric neutral">
     <div class="mlabel">Точка безубыточности</div>
     <div class="mval" id="m_be"></div>
-  </div>
-  <div class="metric info">
-    <div class="mlabel">Маржинальность</div>
-    <div class="mval" id="m_margin"></div>
+    <div style="font-size:10px;color:var(--color-text-tertiary);margin-top:3px" id="m_be_note"></div>
   </div>
   <div class="metric neutral" id="m_vat_card">
     <div class="mlabel">Годовая выручка <span class="tag" id="m_vat_tag">УСН без НДС</span></div>
@@ -514,23 +729,6 @@ h1.print-title { display: none; }
   </div>
 </div>
 
-<!-- BAR CHART -->
-<div class="bar-wrap">
-  <div class="section-title" style="margin-top:0">Структура доходов vs. расходы</div>
-  <div class="bar-row"><span class="blabel">Лиги</span><div class="bar" id="b_liga" style="background:#1D9E75;width:2px"></div><span class="bval" id="bv_liga"></span></div>
-  <div class="bar-row"><span class="blabel">Школы</span><div class="bar" id="b_schools" style="background:#378ADD;width:2px"></div><span class="bval" id="bv_schools"></span></div>
-  <div class="bar-row"><span class="blabel">Тренировки / разовые</span><div class="bar" id="b_train" style="background:#534AB7;width:2px"></div><span class="bval" id="bv_train"></span></div>
-  <div class="bar-row"><span class="blabel">Стадион на день</span><div class="bar" id="b_day_rent" style="background:#5DCAA5;width:2px"></div><span class="bval" id="bv_day_rent"></span></div>
-  <div class="bar-row"><span class="blabel">Турниры + корпоративы</span><div class="bar" id="b_tourn" style="background:#9B8DE8;width:2px"></div><span class="bval" id="bv_tourn"></span></div>
-  <div class="bar-row"><span class="blabel">Кафе</span><div class="bar" id="b_cafe" style="background:#EF9F27;width:2px"></div><span class="bval" id="bv_cafe"></span></div>
-  <div class="bar-row"><span class="blabel">ВИП / помещения</span><div class="bar" id="b_vip" style="background:#D4537E;width:2px"></div><span class="bval" id="bv_vip"></span></div>
-  <div class="bar-row"><span class="blabel">Реклама / нейминг</span><div class="bar" id="b_ads" style="background:#D85A30;width:2px"></div><span class="bval" id="bv_ads"></span></div>
-  <div class="bar-row" style="margin-top:6px">
-    <span class="blabel" style="font-weight:600;color:var(--color-text-primary)">Порог (расходы)</span>
-    <div class="bar" id="b_be" style="background:#E24B4A;opacity:0.4;width:2px"></div>
-    <span class="bval" id="bv_be"></span>
-  </div>
-</div>
 
 <div class="status-bar profit" id="status_bar"> </div>
 
@@ -540,14 +738,210 @@ h1.print-title { display: none; }
 <script>
 // ── State ──
 var counts = { admin: 2, clean: 2, barista: 2 };
+var currentScenario = 'base';
+var skipSave = false;
 
 // ── Helpers ──
 function fmt(n) { return Math.round(n).toLocaleString('ru-RU'); }
-function gv(id)  { return +(document.getElementById(id).value); }
-function gc(id)  { return document.getElementById(id).checked; }
-function sv(id,v){ document.getElementById(id).value = v; }
-function sc(id,v){ document.getElementById(id).checked = v; }
+function gv(id)  { var el=document.getElementById(id); return el ? +el.value : 0; }
+function gc(id)  { var el=document.getElementById(id); return el ? el.checked : false; }
+function sv(id,v){ var el=document.getElementById(id); if(el) el.value = v; }
+function sc(id,v){ var el=document.getElementById(id); if(el) el.checked = v; }
 function st(id,t){ var el = document.getElementById(id); if(el) el.textContent = t; }
+
+// ── Field registry (for state serialization) ──
+var FIELDS = {
+  ranges: ['r_liga','r_schools','r_train','r_day_rent','r_tourn','r_tourn_sch','r_corp','r_cafe','r_cafe_cogs','r_vip','r_spaces','r_ads','r_naming','r_vending','r_vending_share',
+           'e_admin_rate','e_clean_rate','e_aho','e_barista_rate','e_vznosy_pct',
+           'e_guard','e_grass','e_eng','e_clean_out',
+           'e_elec','e_util','e_inv','e_mkt','e_buh','e_misc',
+           'e_land','e_amor','e_loan','e_usn_pct'],
+  checks: ['cb_day_rent','cb_tourn','cb_tourn_sch','cb_corp','cb_cafe','cb_vip','cb_spaces','cb_ads','cb_naming','cb_vending']
+};
+
+// ── PRESETS — single source of truth для сценариев ──
+var PRESETS = {
+  min: {
+    name: 'Минимум',
+    brief: 'Стартовое ядро — лиги + 1 школа + кафе. Дневной блок и доп. потоки выключены.',
+    logic: [
+      '<b>Когда применим:</b> первые 2–3 месяца после открытия. Цель — выйти в безубыточность на одном ядре, пока остальное только раскачивается.',
+      '<b>Что включено:</b> только гарантированные потоки — лиги (вечера будней + выходные на сетке 10 слотов/день) и 1 школа (16-20 пн-пт). Кафе работает с первого дня, но оборот занижен (200к) — узнаваемость низкая, постоянных клиентов нет.',
+      '<b>Что выключено:</b> дневной блок 10-16 пустой (нужно время на B2B-продажи и наработку базы), турниры/корпоративы не организуются (нет ресурса), доп. реклама не продана.',
+      '<b>Ключевая гипотеза:</b> ядро (~1.7 млн выручки) перекрывает базовые расходы. Если прибыль ≥ 0 — модель устойчива, можно расти.',
+      '<b>Риски:</b> заполняемость лиг на старте может быть ниже 100% (нет команд), школа может срываться. Заложен резерв.'
+    ],
+    counts: { admin:2, clean:2, barista:2 },
+    ranges: {
+      r_liga:1032000, r_schools:640000, r_train:0,
+      r_day_rent:200000, r_tourn:150000, r_tourn_sch:100000, r_corp:150000,
+      r_cafe:200000, r_cafe_cogs:42, r_vip:200000, r_spaces:80000,
+      r_ads:100000, r_naming:200000,
+      r_vending:150000, r_vending_share:10,
+      e_admin_rate:90000, e_clean_rate:65000, e_aho:90000, e_barista_rate:75000,
+      e_vznosy_pct:30, e_usn_pct:15,
+      e_guard:200000, e_grass:110000, e_eng:75000, e_clean_out:50000,
+      e_elec:140000, e_util:40000, e_inv:55000,
+      e_mkt:50000, e_buh:40000, e_misc:25000,
+      e_land:57000, e_amor:40000, e_loan:80000
+    },
+    checks: {
+      cb_day_rent:false, cb_tourn:false, cb_tourn_sch:false, cb_corp:false,
+      cb_cafe:true, cb_vip:false, cb_spaces:false, cb_ads:false, cb_naming:false,
+      cb_vending:true
+    }
+  },
+  base: {
+    name: 'База',
+    brief: 'Полная загрузка ядра + дневной блок 10-16 на ~50% + мероприятия + кафе и ВИП-ложи.',
+    logic: [
+      '<b>Когда применим:</b> стабильный режим через 3–6 месяцев работы. Сетка лиг и 1 школа уже устаканились, появилась узнаваемость.',
+      '<b>Новое относительно Минимума:</b> дневной блок 10-16 заполнен на ~50% (500к/мес) — школа малышей 14-16 + товарищеские матчи и одиночные тренировки в обед. Это даёт +35% к выручке от ядра.',
+      '<b>Мероприятия:</b> 1-2 собственных турнира лиги/мес (150к), 1 межшкольный кубок (100к), 2-3 корпоративных заказа в месяц (250к — корп. матчи + 1 турнир). В сумме ~500к — главный драйвер B2B.',
+      '<b>ВИП-ложи:</b> 2 ложи активно используются на мероприятиях (~6 событий × 50к × 50% загрузки = 300к).',
+      '<b>Кафе:</b> оборот вырос до 400к (трафик растёт за счёт дневного блока и мероприятий).',
+      '<b>ФОТ:</b> +1 администратор (3 чел.) и +1 уборщица (3 чел.) — нужно покрыть смены и убирать после мероприятий.',
+      '<b>Что ещё не подключено:</b> реклама на баннерах, нейминг, аренда помещений — это уже фаза «Оптимума».',
+      '<b>Ключевая гипотеза:</b> при заполнении дневного блока + регулярных мероприятиях модель уверенно прибыльна (маржа 30%+).'
+    ],
+    counts: { admin:3, clean:3, barista:2 },
+    ranges: {
+      r_liga:1032000, r_schools:640000, r_train:500000,
+      r_day_rent:200000, r_tourn:150000, r_tourn_sch:100000, r_corp:250000,
+      r_cafe:400000, r_cafe_cogs:42, r_vip:300000, r_spaces:80000,
+      r_ads:100000, r_naming:200000,
+      r_vending:150000, r_vending_share:10,
+      e_admin_rate:90000, e_clean_rate:65000, e_aho:90000, e_barista_rate:75000,
+      e_vznosy_pct:30, e_usn_pct:15,
+      e_guard:200000, e_grass:110000, e_eng:75000, e_clean_out:50000,
+      e_elec:170000, e_util:45000, e_inv:60000,
+      e_mkt:80000, e_buh:40000, e_misc:25000,
+      e_land:57000, e_amor:40000, e_loan:80000
+    },
+    checks: {
+      cb_day_rent:false, cb_tourn:true, cb_tourn_sch:true, cb_corp:true,
+      cb_cafe:true, cb_vip:true, cb_spaces:false, cb_ads:false, cb_naming:false,
+      cb_vending:true
+    }
+  },
+  opt: {
+    name: 'Оптимум',
+    brief: 'Полная монетизация — все потоки активны, дневной блок ~80%, мероприятия, реклама, нейминг, вендинг.',
+    logic: [
+      '<b>Когда применим:</b> идеальный сценарий через 1-1.5 года работы. Все каналы продаж работают, бренд узнаваем.',
+      '<b>Дневной блок 10-16:</b> загружен на ~80% — это плотный поток одиночных тренировок (10к/слот) + товарищеских матчей + школа малышей. Самый большой драйвер роста (+900к).',
+      '<b>Мероприятия:</b> полный календарь — 3-4 турнира лиги/мес (300к), 2 межшкольных кубка (200к), 5-7 корпоративов (700к — больше тимбилдингов с кейтерингом). Стадион на день — 1 крупное событие в месяц (200к).',
+      '<b>Кафе:</b> 700к оборот — стабильный трафик от мероприятий и плотного графика, средний чек подрос.',
+      '<b>ВИП-ложи:</b> 2 ложи × 7 событий × 60к × 60% загрузки = 600к. Часть лож сдаётся в долгосрочный абонемент компаниям.',
+      '<b>Рекламные потоки:</b> подписан нейминг-партнёр (200к), активны баннеры по периметру + LED (200к), помещения сдаются арендатору (100к).',
+      '<b>ФОТ:</b> 4 администратора, 4 уборщицы, 3 бариста — полный штат под плотный график и плотный трафик кафе.',
+      '<b>Внимание:</b> на этом уровне годовая выручка 62.7 млн ₽ — превышает порог УСН без НДС (60 млн). Метрика подсвечивается красным — нужен переход на НДС 5% или 20%.'
+    ],
+    counts: { admin:4, clean:4, barista:3 },
+    ranges: {
+      r_liga:1032000, r_schools:640000, r_train:900000,
+      r_day_rent:200000, r_tourn:300000, r_tourn_sch:200000, r_corp:700000,
+      r_cafe:700000, r_cafe_cogs:42, r_vip:600000, r_spaces:100000,
+      r_ads:200000, r_naming:200000,
+      r_vending:250000, r_vending_share:10,
+      e_admin_rate:90000, e_clean_rate:65000, e_aho:90000, e_barista_rate:75000,
+      e_vznosy_pct:30, e_usn_pct:15,
+      e_guard:200000, e_grass:110000, e_eng:75000, e_clean_out:50000,
+      e_elec:220000, e_util:55000, e_inv:80000,
+      e_mkt:150000, e_buh:50000, e_misc:35000,
+      e_land:57000, e_amor:40000, e_loan:80000
+    },
+    checks: {
+      cb_day_rent:true, cb_tourn:true, cb_tourn_sch:true, cb_corp:true,
+      cb_cafe:true, cb_vip:true, cb_spaces:true, cb_ads:true, cb_naming:true,
+      cb_vending:true
+    }
+  }
+};
+
+// ── State serialization ──
+function readCurrentState() {
+  var s = { counts: { admin:counts.admin, clean:counts.clean, barista:counts.barista }, ranges: {}, checks: {} };
+  FIELDS.ranges.forEach(function(id){ s.ranges[id] = gv(id); });
+  FIELDS.checks.forEach(function(id){ s.checks[id] = gc(id); });
+  return s;
+}
+function applyState(s, doSave) {
+  if (!s) return;
+  skipSave = true;
+  if (s.counts) {
+    syncCountBtns('admin', s.counts.admin || 2);
+    syncCountBtns('clean', s.counts.clean || 2);
+    syncCountBtns('barista', s.counts.barista || 2);
+  }
+  if (s.ranges) FIELDS.ranges.forEach(function(id){
+    if (s.ranges[id] !== undefined) sv(id, s.ranges[id]);
+  });
+  if (s.checks) FIELDS.checks.forEach(function(id){
+    if (s.checks[id] !== undefined) sc(id, s.checks[id]);
+  });
+  skipSave = false;
+  calc();
+  if (doSave !== false) saveToStorage();
+}
+
+// ── Pure compute (no DOM) ──
+function computeMetrics(s) {
+  var r = s.ranges, c = s.checks, ct = s.counts;
+  var liga = r.r_liga||0, schools = r.r_schools||0, train = r.r_train||0;
+  var day_rent = c.cb_day_rent ? (r.r_day_rent||0) : 0;
+  var tourn    = c.cb_tourn    ? (r.r_tourn||0)    : 0;
+  var tournSch = c.cb_tourn_sch? (r.r_tourn_sch||0): 0;
+  var corp     = c.cb_corp     ? (r.r_corp||0)     : 0;
+  var cafe     = c.cb_cafe     ? (r.r_cafe||0)     : 0;
+  var cafeCogs = c.cb_cafe ? Math.round(cafe * (r.r_cafe_cogs||0) / 100) : 0;
+  var vip      = c.cb_vip      ? (r.r_vip||0)      : 0;
+  var spaces   = c.cb_spaces   ? (r.r_spaces||0)   : 0;
+  var ads      = c.cb_ads      ? (r.r_ads||0)      : 0;
+  var naming   = c.cb_naming   ? (r.r_naming||0)   : 0;
+  var vendingTurn = c.cb_vending ? (r.r_vending||0) : 0;
+  var vending  = Math.round(vendingTurn * (r.r_vending_share||0) / 100);
+
+  var adminSal = (ct.admin||0) * (r.e_admin_rate||0);
+  var cleanSal = (ct.clean||0) * (r.e_clean_rate||0);
+  var aho      = r.e_aho||0;
+  var baristaSal = (ct.barista||0) * (r.e_barista_rate||0);
+  var totalSal = adminSal + cleanSal + aho + baristaSal;
+  var vznosy   = Math.round(totalSal * (r.e_vznosy_pct||0) / 100);
+  var fotTotal = totalSal + vznosy;
+
+  var outTotal = (r.e_guard||0) + (r.e_grass||0) + (r.e_eng||0) + (r.e_clean_out||0);
+  var opsTotal = (r.e_elec||0) + (r.e_util||0) + (r.e_inv||0) + (r.e_mkt||0) + (r.e_buh||0) + (r.e_misc||0);
+  var finTotal = (r.e_land||0) + (r.e_amor||0) + (r.e_loan||0);
+
+  // Новая группировка (4 источника): Аренда поля / Мероприятия / Коммерция / Реклама
+  var incField    = liga + schools + train;
+  var incEvents   = day_rent + tourn + tournSch + corp;
+  var incCommerce = cafe + vending + vip + spaces;
+  var incAds      = ads + naming;
+  var income = incField + incEvents + incCommerce + incAds;
+
+  var costs = fotTotal + outTotal + cafeCogs + opsTotal + finTotal;
+  var taxableCosts = costs - (r.e_amor||0);
+  var taxBase = income - taxableCosts;
+  var tax = taxBase > 0 ? Math.round(taxBase * (r.e_usn_pct||0) / 100) : 0;
+  var profit = income - costs - tax;
+  var margin = income > 0 ? Math.round(profit / income * 100) : 0;
+
+  return {
+    income:income, costs:costs, tax:tax, profit:profit, margin:margin,
+    taxBase:taxBase, annual:income*12,
+    incField:incField, incEvents:incEvents, incCommerce:incCommerce, incAds:incAds,
+    opsTotal:opsTotal, finTotal:finTotal, fotTotal:fotTotal, outTotal:outTotal,
+    cafeCogs:cafeCogs, vending:vending,
+    totalSal:totalSal, vznosy:vznosy,
+    adminSal:adminSal, cleanSal:cleanSal, aho:aho, baristaSal:baristaSal,
+    liga:liga, schools:schools, train:train, day_rent:day_rent,
+    tourn:tourn, tournSch:tournSch, corp:corp,
+    cafe:cafe, vip:vip, spaces:spaces, ads:ads, naming:naming,
+    vendingTurn:vendingTurn
+  };
+}
 
 // ── Count selectors ──
 function setCount(type, n, btn) {
@@ -557,275 +951,378 @@ function setCount(type, n, btn) {
   if (btn) btn.classList.add('active');
   calc();
 }
-
 function syncCountBtns(type, n) {
   counts[type] = n;
   var grp = document.getElementById(type + '_btns');
   if (!grp) return;
   var btns = grp.querySelectorAll('.cbtn');
   btns.forEach(function(b){ b.classList.remove('active'); });
-  // Find button with matching text
   btns.forEach(function(b){ if (b.textContent.trim() == String(n)) b.classList.add('active'); });
 }
 
-// ── Main calculation ──
+// ── Main render: read state → compute → update DOM ──
 function calc() {
-  // Income
-  var liga     = gv('r_liga');
-  var schools  = gv('r_schools');
-  var train    = gv('r_train');
-  var day_rent = gc('cb_day_rent') ? gv('r_day_rent') : 0;
-  var tourn    = gc('cb_tourn')    ? gv('r_tourn')    : 0;
-  var tournSch = gc('cb_tourn_sch')? gv('r_tourn_sch'): 0;
-  var corp     = gc('cb_corp')     ? gv('r_corp')     : 0;
-  var cafe     = gc('cb_cafe')     ? gv('r_cafe')     : 0;
-  var cafeCogsPct = gv('r_cafe_cogs');
-  var cafeCogs    = gc('cb_cafe') ? Math.round(cafe * cafeCogsPct / 100) : 0;
-  var vip      = gc('cb_vip')      ? gv('r_vip')      : 0;
-  var spaces   = gc('cb_spaces')   ? gv('r_spaces')   : 0;
-  var ads      = gc('cb_ads')      ? gv('r_ads')       : 0;
-  var naming   = gc('cb_naming')   ? gv('r_naming')   : 0;
+  var s = readCurrentState();
+  var m = computeMetrics(s);
+  var r = s.ranges, c = s.checks;
 
-  // FOT salaries
-  var adminRate   = gv('e_admin_rate');
-  var adminSal    = counts.admin * adminRate;
-  var cleanRate   = gv('e_clean_rate');
-  var cleanSal    = counts.clean * cleanRate;
-  var aho         = gv('e_aho');
-  var baristaRate = gv('e_barista_rate');
-  var baristaSal  = counts.barista * baristaRate;
-  var totalSal    = adminSal + cleanSal + aho + baristaSal;
-
-  // Vznosy
-  var vznosyPct = gv('e_vznosy_pct');
-  var vznosyAmt = Math.round(totalSal * vznosyPct / 100);
-  var fotTotal  = totalSal + vznosyAmt;
+  // FOT block
+  st('admin_sub',     fmt(m.adminSal)   + ' (×' + counts.admin   + ')');
+  st('clean_sub',     fmt(m.cleanSal)   + ' (×' + counts.clean   + ')');
+  st('barista_sub',   fmt(m.baristaSal) + ' (×' + counts.barista + ')');
+  st('ve_admin_rate', fmt(r.e_admin_rate));
+  st('ve_clean_rate', fmt(r.e_clean_rate));
+  st('ve_aho',        fmt(m.aho));
+  st('ve_barista_rate', fmt(r.e_barista_rate));
+  st('vznosy_pct_val',  r.e_vznosy_pct + '%');
+  st('vznosy_amt',      '+ ' + fmt(m.vznosy));
+  st('fot_note',        'оклады ' + fmt(m.totalSal) + ' + взносы ' + fmt(m.vznosy));
+  st('fot_total_val',   fmt(m.fotTotal) + ' ₽');
+  st('fot_grand_display', fmt(m.fotTotal) + ' ₽');
 
   // Outsourcing
-  var guard    = gv('e_guard');
-  var grass    = gv('e_grass');
-  var eng      = gv('e_eng');
-  var cleanOut = gv('e_clean_out');
-  var outTotal = guard + grass + eng + cleanOut;
+  st('ve_guard',    fmt(r.e_guard));
+  st('ve_grass',    fmt(r.e_grass));
+  st('ve_eng',      fmt(r.e_eng));
+  st('ve_clean_out',fmt(r.e_clean_out));
+  st('out_total_display', fmt(m.outTotal) + ' ₽');
 
-  // Operations
-  var elec = gv('e_elec'), util = gv('e_util'), inv  = gv('e_inv');
-  var mkt  = gv('e_mkt'),  buh  = gv('e_buh'),  misc = gv('e_misc');
+  // Operations & financial
+  st('ve_elec', fmt(r.e_elec)); st('ve_util', fmt(r.e_util)); st('ve_inv', fmt(r.e_inv));
+  st('ve_mkt',  fmt(r.e_mkt));  st('ve_buh',  fmt(r.e_buh));  st('ve_misc', fmt(r.e_misc));
+  st('ve_land', fmt(r.e_land)); st('ve_amor', fmt(r.e_amor)); st('ve_loan', fmt(r.e_loan));
 
-  // Financial
-  var land = gv('e_land'), amor = gv('e_amor'), loan = gv('e_loan');
+  // Income
+  st('v_liga',     fmt(m.liga));
+  st('v_schools',  fmt(m.schools));
+  st('v_train',    fmt(m.train));
+  st('v_day_rent', c.cb_day_rent ? fmt(r.r_day_rent) : '—');
+  st('v_tourn',    c.cb_tourn    ? fmt(r.r_tourn)    : '—');
+  st('v_tourn_sch',c.cb_tourn_sch? fmt(r.r_tourn_sch): '—');
+  st('v_corp',     c.cb_corp     ? fmt(r.r_corp)     : '—');
+  st('v_cafe',     c.cb_cafe     ? fmt(r.r_cafe)     : '—');
+  st('v_cafe_cogs', c.cb_cafe    ? r.r_cafe_cogs + '% (' + fmt(m.cafeCogs) + ')' : '—');
+  st('v_vip',      c.cb_vip      ? fmt(r.r_vip)      : '—');
+  st('v_spaces',   c.cb_spaces   ? fmt(r.r_spaces)   : '—');
+  st('v_ads',      c.cb_ads      ? fmt(r.r_ads)      : '—');
+  st('v_naming',   c.cb_naming   ? fmt(r.r_naming)   : '—');
+  st('v_vending',  c.cb_vending  ? fmt(r.r_vending)  : '—');
+  st('v_vending_share', c.cb_vending ? r.r_vending_share + '% (' + fmt(m.vending) + ')' : '—');
+  st('usn_pct_display', r.e_usn_pct + '%');
 
-  // Tax
-  var usnPct = gv('e_usn_pct');
+  // Block totals (4 группы доходов)
+  st('inc_field_total',    fmt(m.incField)    + ' ₽');
+  st('inc_events_total',   fmt(m.incEvents)   + ' ₽');
+  st('inc_commerce_total', fmt(m.incCommerce) + ' ₽');
+  st('inc_ads_total',      fmt(m.incAds)      + ' ₽');
+  st('ops_total_display',  fmt(m.opsTotal)    + ' ₽');
+  st('fin_total_display',  fmt(m.finTotal)    + ' ₽');
+  // Section totals (рядом с заголовками "Доходы — ₽/мес" и "Расходы — ₽/мес")
+  st('sec_income_sum', fmt(m.income) + ' ₽');
+  st('sec_costs_sum',  fmt(m.costs)  + ' ₽');
 
-  // ── Update FOT block ──
-  st('admin_sub',       fmt(adminSal)   + ' (×' + counts.admin   + ')');
-  st('clean_sub',       fmt(cleanSal)   + ' (×' + counts.clean   + ')');
-  st('barista_sub',     fmt(baristaSal) + ' (×' + counts.barista + ')');
-  st('ve_admin_rate',   fmt(adminRate));
-  st('ve_clean_rate',   fmt(cleanRate));
-  st('ve_aho',          fmt(aho));
-  st('ve_barista_rate', fmt(baristaRate));
-  st('vznosy_pct_val',  vznosyPct + '%');
-  st('vznosy_amt',      '+ ' + fmt(vznosyAmt));
-  st('fot_note',        'оклады ' + fmt(totalSal) + ' + взносы ' + fmt(vznosyAmt));
-  st('fot_total_val',   fmt(fotTotal) + ' ₽');
-  st('fot_grand_display', fmt(fotTotal) + ' ₽');
+  // P&L metrics
+  st('m_income', fmt(m.income) + ' ₽');
+  st('m_costs',  fmt(m.costs)  + ' ₽');
+  st('m_tax',    fmt(m.tax)    + ' ₽');
+  st('m_tax_note', 'база: ' + fmt(Math.max(0,m.taxBase)) + ' ₽ (расходы без амортизации)');
+  st('m_margin', m.margin + '%');
+  var pm = document.getElementById('m_profit');
+  if (pm) {
+    pm.textContent = (m.profit >= 0 ? '+' : '') + fmt(m.profit) + ' ₽';
+    var pmCard = pm.closest('.metric');
+    if (pmCard) pmCard.className = 'metric ' + (m.profit > 0 ? 'good' : m.profit < 0 ? 'bad' : 'neutral');
+  }
+  // Точная точка безубыточности: учитывает налог УСН на сумму "над" амортизацией
+  // BE = costs + amor × (usn / (100 - usn))
+  var beExact = m.costs + (r.e_amor||0) * (r.e_usn_pct||0) / Math.max(1, (100 - (r.e_usn_pct||0)));
+  st('m_be',     fmt(beExact) + ' ₽');
+  st('m_be_note','выручка для нулевой прибыли (включая налог)');
 
-  // ── Update outsourcing ──
-  st('ve_guard',    fmt(guard));
-  st('ve_grass',    fmt(grass));
-  st('ve_eng',      fmt(eng));
-  st('ve_clean_out',fmt(cleanOut));
-  st('out_total_display', fmt(outTotal) + ' ₽');
-
-  // ── Update operations ──
-  st('ve_elec', fmt(elec)); st('ve_util', fmt(util)); st('ve_inv',  fmt(inv));
-  st('ve_mkt',  fmt(mkt));  st('ve_buh',  fmt(buh));  st('ve_misc', fmt(misc));
-
-  // ── Update financial ──
-  st('ve_land', fmt(land)); st('ve_amor', fmt(amor)); st('ve_loan', fmt(loan));
-
-  // ── Update income ──
-  st('v_liga',     fmt(liga));
-  st('v_schools',  fmt(schools));
-  st('v_train',    fmt(train));
-  st('v_day_rent', gc('cb_day_rent') ? fmt(gv('r_day_rent')) : '—');
-  st('v_tourn',    gc('cb_tourn')    ? fmt(gv('r_tourn'))    : '—');
-  st('v_tourn_sch',gc('cb_tourn_sch')? fmt(gv('r_tourn_sch')): '—');
-  st('v_corp',     gc('cb_corp')     ? fmt(gv('r_corp'))     : '—');
-  st('v_cafe',     gc('cb_cafe')     ? fmt(gv('r_cafe'))     : '—');
-  st('v_cafe_cogs', gc('cb_cafe')    ? cafeCogsPct + '% (' + fmt(cafeCogs) + ')' : '—');
-  st('v_vip',      gc('cb_vip')      ? fmt(gv('r_vip'))      : '—');
-  st('v_spaces',   gc('cb_spaces')   ? fmt(gv('r_spaces'))   : '—');
-  st('v_ads',      gc('cb_ads')      ? fmt(gv('r_ads'))      : '—');
-  st('v_naming',   gc('cb_naming')   ? fmt(gv('r_naming'))   : '—');
-
-  // ── USN display ──
-  st('usn_pct_display', usnPct + '%');
-
-  // ── Block totals ──
-  var incGuaranteed = liga + schools;
-  var incVariable   = train + day_rent + tourn + tournSch + corp;
-  var incAdditional = cafe + vip + spaces + ads + naming;
-  var opsTotal      = elec + util + inv + mkt + buh + misc;
-  var finTotal      = land + amor + loan;
-  st('inc_g_total',     fmt(incGuaranteed) + ' ₽');
-  st('inc_v_total',     fmt(incVariable)   + ' ₽');
-  st('inc_a_total',     fmt(incAdditional) + ' ₽');
-  st('ops_total_display', fmt(opsTotal)    + ' ₽');
-  st('fin_total_display', fmt(finTotal)    + ' ₽');
-
-  // ── P&L ──
-  var income  = liga + schools + train + day_rent + tourn + tournSch + corp + cafe + vip + spaces + ads + naming;
-  var costs   = fotTotal + outTotal + cafeCogs + elec + util + inv + mkt + buh + misc + land + amor + loan;
-  // Налоговая база УСН Д−Р: амортизация исключается (на УСН не списывается)
-  var taxableCosts = costs - amor;
-  var taxBase = income - taxableCosts;
-  var tax     = taxBase > 0 ? Math.round(taxBase * usnPct / 100) : 0;
-  var profit  = income - costs - tax;
-  var margin  = income > 0 ? Math.round(profit / income * 100) : 0;
-
-  st('m_income', fmt(income) + ' ₽');
-  st('m_costs',  fmt(costs)  + ' ₽');
-  st('m_tax',    fmt(tax)    + ' ₽');
-  st('m_tax_note', 'база: ' + fmt(Math.max(0,taxBase)) + ' ₽ (расходы без амортизации)');
-  st('m_be',     fmt(costs)  + ' ₽');
-  st('m_margin', margin      + '%');
-
-  // ── Годовая выручка vs лимит НДС (ФЗ-176, порог 60 млн/год) ──
-  var annual    = income * 12;
+  // Годовая выручка vs НДС
   var vatLimit  = 60000000;
-  var vatLimit2 = 250000000; // граница ставки 5%
-  st('m_annual', fmt(annual) + ' ₽');
+  var vatLimit2 = 250000000;
+  st('m_annual', fmt(m.annual) + ' ₽');
   var vatCard = document.getElementById('m_vat_card');
   var vatTag  = document.getElementById('m_vat_tag');
-  if (annual <= vatLimit * 0.7) {
+  if (m.annual <= vatLimit * 0.7) {
     vatCard.className = 'metric good';
     vatTag.textContent = 'УСН без НДС';
-    st('m_vat_note', 'до лимита ' + fmt(vatLimit - annual) + ' ₽ (60 млн)');
-  } else if (annual <= vatLimit) {
+    st('m_vat_note', 'до лимита ' + fmt(vatLimit - m.annual) + ' ₽ (60 млн)');
+  } else if (m.annual <= vatLimit) {
     vatCard.className = 'metric neutral';
-    vatTag.textContent = 'УСН без НДС (близко к лимиту)';
-    st('m_vat_note', 'до лимита ' + fmt(vatLimit - annual) + ' ₽ — следить');
-  } else if (annual <= vatLimit2) {
+    vatTag.textContent = 'УСН без НДС (близко)';
+    st('m_vat_note', 'до лимита ' + fmt(vatLimit - m.annual) + ' ₽ — следить');
+  } else if (m.annual <= vatLimit2) {
     vatCard.className = 'metric bad';
     vatTag.textContent = 'НДС 5% или 20%';
-    st('m_vat_note', 'превышен лимит 60 млн — НДС обязателен (5% без вычетов / 20% с вычетами)');
+    st('m_vat_note', 'превышен лимит 60 млн — НДС обязателен');
   } else {
     vatCard.className = 'metric bad';
     vatTag.textContent = 'НДС 7% или 20%';
     st('m_vat_note', 'выручка > 250 млн — ставка 5% недоступна');
   }
 
-  var pm = document.getElementById('m_profit');
-  pm.textContent = (profit >= 0 ? '+' : '') + fmt(profit) + ' ₽';
-  pm.closest('.metric').className = 'metric ' + (profit > 0 ? 'good' : profit < 0 ? 'bad' : 'neutral');
-
   var sb = document.getElementById('status_bar');
-  if (profit > 50000) {
+  if (m.profit > 50000) {
     sb.className = 'status-bar profit';
-    sb.textContent = '✓ Прибыль после налогов: +' + fmt(profit) + ' ₽/мес · маржинальность ' + margin + '%';
-  } else if (profit < -50000) {
+    sb.textContent = '✓ Прибыль после налогов: +' + fmt(m.profit) + ' ₽/мес · маржинальность ' + m.margin + '%';
+  } else if (m.profit < -50000) {
     sb.className = 'status-bar loss';
-    sb.textContent = '✗ Убыток ' + fmt(Math.abs(profit)) + ' ₽/мес — нужно увеличить доходы или сократить расходы';
+    sb.textContent = '✗ Убыток ' + fmt(Math.abs(m.profit)) + ' ₽/мес — нужно увеличить доходы или сократить расходы';
   } else {
     sb.className = 'status-bar breakeven';
-    sb.textContent = '≈ Около точки безубыточности (' + (profit >= 0 ? '+' : '') + fmt(profit) + ' ₽)';
+    sb.textContent = '≈ Около точки безубыточности (' + (m.profit >= 0 ? '+' : '') + fmt(m.profit) + ' ₽)';
   }
 
-  // ── Bar chart ──
-  var maxW   = 200;
-  var maxVal = Math.max(income, costs, 1);
-  var bars = [
-    ['b_liga',     'bv_liga',     liga],
-    ['b_schools',  'bv_schools',  schools],
-    ['b_train',    'bv_train',    train],
-    ['b_day_rent', 'bv_day_rent', day_rent],
-    ['b_tourn',    'bv_tourn',    tourn + tournSch + corp],
-    ['b_cafe',     'bv_cafe',     cafe],
-    ['b_vip',      'bv_vip',      vip + spaces],
-    ['b_ads',      'bv_ads',      ads + naming],
-    ['b_be',       'bv_be',       costs]
+
+  // Analytics & state extras
+  renderComparison();
+  renderScenarioBreakdown();
+  highlightModified(s);
+  if (!skipSave) saveToStorage();
+}
+
+// ── Comparison table ──
+function renderComparison() {
+  var metrics = {
+    min: computeMetrics({ counts: PRESETS.min.counts, ranges: PRESETS.min.ranges, checks: PRESETS.min.checks }),
+    base: computeMetrics({ counts: PRESETS.base.counts, ranges: PRESETS.base.ranges, checks: PRESETS.base.checks }),
+    opt: computeMetrics({ counts: PRESETS.opt.counts, ranges: PRESETS.opt.ranges, checks: PRESETS.opt.checks })
+  };
+  var rows = [
+    { label: 'Выручка', key: 'income', f: function(v){ return fmt(v) + ' ₽'; } },
+    { label: 'Расходы (вкл. COGS)', key: 'costs', f: function(v){ return fmt(v) + ' ₽'; } },
+    { label: 'Налог УСН 15%', key: 'tax', f: function(v){ return fmt(v) + ' ₽'; } },
+    { label: 'Чистая прибыль', key: 'profit', f: function(v){ return (v>=0?'+':'') + fmt(v) + ' ₽'; }, profit: true, emphasis: true },
+    { label: 'Маржинальность', key: 'margin', f: function(v){ return v + '%'; } },
+    { label: 'Годовая выручка', key: 'annual', f: function(v){ return fmt(v) + ' ₽'; } }
   ];
-  bars.forEach(function(item) {
-    var b = document.getElementById(item[0]);
-    var v = document.getElementById(item[1]);
-    if (b) b.style.width = Math.max(2, Math.round(item[2] / maxVal * maxW)) + 'px';
-    if (v) v.textContent = item[2] > 0 ? fmt(item[2]) : '—';
+  var html = '';
+  rows.forEach(function(row) {
+    var cls = row.emphasis ? ' class="row-emphasis"' : '';
+    html += '<tr' + cls + '>';
+    html += '<td>' + row.label + '</td>';
+    ['min','base','opt'].forEach(function(sc){
+      var v = metrics[sc][row.key];
+      var cellCls = '';
+      if (row.profit) cellCls = ' class="profit-cell ' + (v >= 0 ? 'pos' : 'neg') + '"';
+      html += '<td' + cellCls + '>' + row.f(v) + '</td>';
+    });
+    html += '</tr>';
+  });
+  document.getElementById('cmp_body').innerHTML = html;
+}
+
+// ── Scenario logic (раскрывающийся блок: ход мысли, почему такие цифры) ──
+function renderScenarioBreakdown() {
+  var preset = PRESETS[currentScenario];
+  if (!preset || !preset.logic) return;
+  var html = '<div class="logic-list">';
+  preset.logic.forEach(function(line){
+    html += '<p>' + line + '</p>';
+  });
+  html += '</div>';
+  document.getElementById('scenario_breakdown').innerHTML = html;
+}
+
+// ── Highlight modified-from-preset ──
+function highlightModified(curState) {
+  var preset = PRESETS[currentScenario];
+  if (!preset) return;
+  document.querySelectorAll('.row, .staff-row, .out-row, .count-row').forEach(function(row){
+    var modified = false;
+    row.querySelectorAll('input[type=range], input[type=checkbox]').forEach(function(input){
+      var id = input.id;
+      if (input.type === 'range') {
+        var pv = preset.ranges[id];
+        if (pv !== undefined && +input.value !== pv) modified = true;
+      } else {
+        var pv = preset.checks[id];
+        if (pv !== undefined && input.checked !== pv) modified = true;
+      }
+    });
+    if (row.classList.contains('count-row')) {
+      var grp = row.querySelector('[id$="_btns"]');
+      if (grp) {
+        var type = grp.id.replace('_btns','');
+        if (preset.counts[type] !== counts[type]) modified = true;
+      }
+    }
+    if (modified) row.classList.add('modified');
+    else row.classList.remove('modified');
   });
 }
 
-// ── Scenario presets ──
-var SCENARIO_TEXTS = {
-  min:  '<strong>Минимум</strong> — стартовое ядро. Лиги (1.03 млн: пн–пт 20–23 + сб–вс 9–23 × 6 000 ₽/ч) + 1 школа (640 тыс.: пн–пт 16–20 × 8 000 ₽/ч) + кафе (200 тыс. оборот, COGS 42%). Дневной блок 10–16 не задействован. Турниры и доп. потоки выключены. 2 администратора.',
-  base: '<strong>База</strong> — лиги (1.03 млн) и школы (640к) как в минимуме + заполнение дневного блока 10-16 на ~50% (тренировки/товарищеские + школа малышей — 500к) + турниры лиги (150к), школ (100к), корпоративы (250к). Кафе 400к оборот (COGS 42%). ВИП-ложи на ивентах (300к). 2 администратора.',
-  opt:  '<strong>Оптимум</strong> — лиги/школы как в минимуме + дневной блок на ~80% (900к) + турниры лиги (300к), школ (200к) + корпоративы (700к) + стадион на день (200к) + кафе 700к + ВИП (600к) + помещения + реклама + нейминг. 3 администратора.'
-};
-
+// ── Scenario tabs ──
 function setScenario(s, el) {
+  currentScenario = s;
   document.querySelectorAll('.stab').forEach(function(b){ b.classList.remove('active'); });
-  el.classList.add('active');
-  var info = document.getElementById('scenario_info');
-  if (info) info.innerHTML = SCENARIO_TEXTS[s];
-
-  if (s === 'min') {
-    sv('r_liga',1032000); sv('r_schools',640000); sv('r_train',0);
-    sc('cb_day_rent',false);
-    sc('cb_tourn',false); sv('r_tourn',150000);
-    sc('cb_tourn_sch',false); sv('r_tourn_sch',100000);
-    sc('cb_corp',false); sv('r_corp',150000);
-    sc('cb_cafe',true); sv('r_cafe',200000); sv('r_cafe_cogs',42);
-    sc('cb_vip',false); sc('cb_spaces',false); sc('cb_ads',false); sc('cb_naming',false);
-    syncCountBtns('admin',2); syncCountBtns('clean',2); syncCountBtns('barista',2);
-    sv('e_admin_rate',90000); sv('e_clean_rate',65000); sv('e_aho',90000); sv('e_barista_rate',75000);
-    sv('e_vznosy_pct',30); sv('e_usn_pct',15);
-    sv('e_guard',200000); sv('e_grass',110000); sv('e_eng',75000); sv('e_clean_out',50000);
-    sv('e_elec',140000); sv('e_util',40000); sv('e_inv',55000);
-    sv('e_mkt',50000); sv('e_buh',40000); sv('e_misc',25000);
-    sv('e_land',57000); sv('e_amor',40000); sv('e_loan',80000);
-
-  } else if (s === 'base') {
-    sv('r_liga',1032000); sv('r_schools',640000); sv('r_train',500000);
-    sc('cb_day_rent',false);
-    sc('cb_tourn',true); sv('r_tourn',150000);
-    sc('cb_tourn_sch',true); sv('r_tourn_sch',100000);
-    sc('cb_corp',true); sv('r_corp',250000);
-    sc('cb_cafe',true); sv('r_cafe',400000); sv('r_cafe_cogs',42);
-    sc('cb_vip',true); sv('r_vip',300000);
-    sc('cb_spaces',false); sc('cb_ads',false); sc('cb_naming',false);
-    syncCountBtns('admin',2); syncCountBtns('clean',2); syncCountBtns('barista',2);
-    sv('e_admin_rate',90000); sv('e_clean_rate',65000); sv('e_aho',90000); sv('e_barista_rate',75000);
-    sv('e_vznosy_pct',30); sv('e_usn_pct',15);
-    sv('e_guard',200000); sv('e_grass',110000); sv('e_eng',75000); sv('e_clean_out',50000);
-    sv('e_elec',170000); sv('e_util',45000); sv('e_inv',60000);
-    sv('e_mkt',80000); sv('e_buh',40000); sv('e_misc',25000);
-    sv('e_land',57000); sv('e_amor',40000); sv('e_loan',80000);
-
-  } else {
-    sv('r_liga',1032000); sv('r_schools',640000); sv('r_train',900000);
-    sc('cb_day_rent',true); sv('r_day_rent',200000);
-    sc('cb_tourn',true); sv('r_tourn',300000);
-    sc('cb_tourn_sch',true); sv('r_tourn_sch',200000);
-    sc('cb_corp',true); sv('r_corp',700000);
-    sc('cb_cafe',true); sv('r_cafe',700000); sv('r_cafe_cogs',42);
-    sc('cb_vip',true); sv('r_vip',600000);
-    sc('cb_spaces',true); sv('r_spaces',100000);
-    sc('cb_ads',true); sv('r_ads',200000);
-    sc('cb_naming',true); sv('r_naming',200000);
-    syncCountBtns('admin',3); syncCountBtns('clean',2); syncCountBtns('barista',2);
-    sv('e_admin_rate',90000); sv('e_clean_rate',65000); sv('e_aho',90000); sv('e_barista_rate',75000);
-    sv('e_vznosy_pct',30); sv('e_usn_pct',15);
-    sv('e_guard',200000); sv('e_grass',110000); sv('e_eng',75000); sv('e_clean_out',50000);
-    sv('e_elec',220000); sv('e_util',55000); sv('e_inv',80000);
-    sv('e_mkt',150000); sv('e_buh',50000); sv('e_misc',35000);
-    sv('e_land',57000); sv('e_amor',40000); sv('e_loan',80000);
-  }
-  calc();
+  if (el) el.classList.add('active');
+  var preset = PRESETS[s];
+  if (!preset) return;
+  var brief = document.getElementById('scenario_brief');
+  if (brief) brief.innerHTML = '<strong>' + preset.name + '</strong> — ' + preset.brief;
+  applyState({ counts: preset.counts, ranges: preset.ranges, checks: preset.checks }, true);
 }
 
-// Initial render
-calc();
+function resetToScenario() {
+  var tab = document.querySelector('.stab.active');
+  setScenario(currentScenario, tab);
+}
+
+// ── localStorage ──
+var STORAGE_KEY = 'arena_calc_state_v6';
+function saveToStorage() {
+  try {
+    var s = readCurrentState();
+    s._scenario = currentScenario;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  } catch(e) {}
+}
+function loadFromStorage() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch(e) { return null; }
+}
+
+// ── URL state ──
+function encodeStateToHash() {
+  var s = readCurrentState();
+  s._scenario = currentScenario;
+  var json = JSON.stringify(s);
+  return btoa(unescape(encodeURIComponent(json)));
+}
+function decodeStateFromHash(hash) {
+  try {
+    var json = decodeURIComponent(escape(atob(hash)));
+    return JSON.parse(json);
+  } catch(e) { return null; }
+}
+function copyShareLink() {
+  var hash = encodeStateToHash();
+  var url = location.origin + location.pathname + '#s=' + hash;
+  var done = function() {
+    var btn = document.getElementById('btn_share');
+    if (!btn) return;
+    var orig = btn.textContent;
+    btn.textContent = '✓ Скопировано';
+    btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(function(){ prompt('Скопируйте ссылку:', url); });
+  } else {
+    prompt('Скопируйте ссылку:', url);
+  }
+}
+
+// ── Tooltips: add ? to selected fields ──
+var TIPS = {
+  'r_liga':       'Лиги: пн-пт 20:10/21:30 + сб-вс 9:20-22:50, ставка 6 000 ₽/час. По расчёту 10 слотов × 80 мин × 2 дня выходных + 2 слота × 5 будней = ~960к-1.03 млн/мес',
+  'r_schools':    'Школы: пн-пт 16:00/17:30/18:50, ставка 8 000-10 000 ₽/час. 3 слота × 5 дней × 4 недели × ставка = 640к для одной школы',
+  'r_train':      'Дневной блок 10-16: тренировки/товарищеские/одиночные/школа малышей. 5 слотов/день × 5 будней × 4 недели = 100 слотов потенциал. База ~50% загрузки, оптимум ~80%',
+  'r_day_rent':   'Аренда стадиона на крупное событие (день рождения, мероприятие). 150-250 тыс. за событие, обычно 1-2 раза в месяц на оптимуме',
+  'r_tourn':      'Наши собственные турниры лиг: 1-3 в месяц, средний чек 100-300к',
+  'r_tourn_sch':  'Межшкольные кубки/первенства: 1-2 в месяц, средний чек 80-200к',
+  'r_corp':       'Корпоративы внешних компаний: корп. матч 30-50к, корп. турнир 150-400к, тимбилдинг 300-700к. На базе 2-3/мес, на оптимуме 5-7/мес',
+  'r_cafe':       'Оборот спорт-буфета (кофе/хот-доги/снеки/выпечка) без алкоголя и кухни. Зависит от трафика — лиги дают ~3000 посещений/мес, школы ~1500, дневной блок ~1000',
+  'r_cafe_cogs':  'Себестоимость закупа. Кофе ~25%, хот-доги/снеки ~45-55%. Средневзвешенно для арены ~40-45%',
+  'r_vip':        '2 ложи, цена на ивент 40-80к, абонемент компании 150-300к/мес. База: 5-7 ивентов × 2 ложи × 50к × 50% загрузки = 300к',
+  'r_vending':    'Оборот 1-2 вендинговых автоматов на стадионе. По договору арене 10% от оборота',
+  'e_admin_rate': 'Москва/МО, медианная ставка 80-110к. Сменный график 2/2',
+  'e_aho':        'АХО / Комендант с инженерными функциями — 70-110к',
+  'e_clean_rate': 'Уборщица график 2/2 — 55-70к',
+  'e_barista_rate':'Бариста: 70-90к. Бар-менеджер опытный — выше',
+  'e_vznosy_pct': 'Страховые взносы на ФОТ. Стандарт 30%. С МСП-льготой средневзвешенно ~20% (сейчас не применяется)',
+  'e_usn_pct':    'УСН Доходы−Расходы стандартная ставка 15%. База налога считается без амортизации (на УСН она не списывается)',
+  'e_elec':       'Освещение поля, отопление, климат. На оптимуме растёт за счёт ивентов и зимы',
+  'e_land':       'Аренда земельного участка — фиксированный платёж по договору',
+  'e_amor':       'Амортизация основных средств (поле, оборудование, мебель). НЕ уменьшает налоговую базу УСН',
+  'e_loan':       'Проценты по займу. Тело кредита учитывается отдельно в кэш-флоу (не в P&L)',
+  'e_guard':      'Охрана 24/7, 2-3 охранника. На крупные ивенты — доп. охрана отдельно'
+};
+
+function setupTooltips() {
+  Object.keys(TIPS).forEach(function(id){
+    var input = document.getElementById(id);
+    if (!input) return;
+    var row = input.closest('.row') || input.closest('.staff-row') || input.closest('.out-row');
+    if (!row) return;
+    var label = row.querySelector('label');
+    if (!label || label.querySelector('.tip')) return;
+    var tip = document.createElement('span');
+    tip.className = 'tip';
+    tip.setAttribute('data-tip', TIPS[id]);
+    tip.textContent = '?';
+    // Insert at end of label first line: append to label directly
+    label.appendChild(tip);
+  });
+}
+
+// ── Collapsible blocks ──
+function setupCollapse() {
+  document.querySelectorAll('.section-block, .fot-block, .out-block').forEach(function(block){
+    var header = block.querySelector('.block-header');
+    if (!header) return;
+    if (!header.querySelector('.toggle-caret')) {
+      var caret = document.createElement('span');
+      caret.className = 'toggle-caret';
+      caret.textContent = '▾';
+      header.insertBefore(caret, header.firstChild);
+    }
+    // Default state: collapsed unless data-keep-open="1"
+    var keepOpen = block.getAttribute('data-keep-open') === '1';
+    if (!keepOpen) block.classList.add('collapsed');
+
+    var label = header.querySelector('.block-label');
+    if (label && !header.querySelector('.toggle-hint')) {
+      var hint = document.createElement('span');
+      hint.className = 'toggle-hint';
+      hint.textContent = block.classList.contains('collapsed') ? 'развернуть' : 'свернуть';
+      label.appendChild(hint);
+    }
+    header.addEventListener('click', function(e){
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'LABEL') return;
+      block.classList.toggle('collapsed');
+      var h = block.querySelector('.toggle-hint');
+      if (h) h.textContent = block.classList.contains('collapsed') ? 'развернуть' : 'свернуть';
+    });
+  });
+}
+
+// ── Initialization ──
+(function init() {
+  setupCollapse();
+  setupTooltips();
+  var loaded = null;
+  // 1. Try URL hash
+  if (location.hash && location.hash.indexOf('#s=') === 0) {
+    loaded = decodeStateFromHash(location.hash.slice(3));
+  }
+  // 2. Try localStorage
+  if (!loaded) loaded = loadFromStorage();
+
+  if (loaded && loaded._scenario && PRESETS[loaded._scenario]) {
+    currentScenario = loaded._scenario;
+    var tab = document.querySelector('.stab[onclick*="\'' + loaded._scenario + '\'"]');
+    if (tab) {
+      document.querySelectorAll('.stab').forEach(function(b){ b.classList.remove('active'); });
+      tab.classList.add('active');
+    }
+  }
+  var p = PRESETS[currentScenario] || PRESETS.base;
+  var brief = document.getElementById('scenario_brief');
+  if (brief) brief.innerHTML = '<strong>' + p.name + '</strong> — ' + p.brief;
+
+  if (loaded) {
+    applyState(loaded, false);
+  } else {
+    calc();
+  }
+})();
 </script>
 </body>
 </html>
