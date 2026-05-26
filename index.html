@@ -1,4 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Финансовая модель стадиона АРЕНА 8×8 — интерактивный калькулятор P&L">
+<title>АРЕНА 8×8 — Финансовая модель</title>
 <style>
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  --color-text-primary: #1A1A1A;
+  --color-text-secondary: #5A5A5A;
+  --color-text-tertiary: #8E8E8E;
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #F5F4F0;
+  --color-border-secondary: #DDDDD8;
+  --color-border-tertiary: #EBEBE8;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 24px 32px;
+}
 * { box-sizing: border-box; }
 .wrap { padding: 16px 0 28px; font-family: var(--font-sans); }
 
@@ -20,70 +51,100 @@
 .scenario-info strong { color: var(--color-text-primary); }
 
 /* ── Layout ── */
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 28px; align-items: start; }
 @media (max-width: 560px) { .two-col { grid-template-columns: 1fr; } }
+.fin-grid { display: block; }
+.section-block { background: var(--color-background-secondary); border-radius: 10px; padding: 11px 13px; margin-bottom: 10px; }
 
 /* ── Labels ── */
-.section-title { font-size: 10.5px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 10px; }
-.sub-title { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 8px; }
+.section-title { font-size: 10.5px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; margin: 16px 0 8px; }
+.sub-title { font-size: 10px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 10px 0 6px; }
 
 /* ── Standard row ── */
-.row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
-.row label { font-size: 12.5px; color: var(--color-text-primary); flex: 1.3; min-width: 145px; }
+.row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.row label { font-size: 12px; color: var(--color-text-primary); flex: 1.3; min-width: 135px; }
 .row input[type=range] { flex: 1.4; accent-color: #1D9E75; min-width: 0; }
-.row .val { font-size: 12.5px; font-weight: 500; min-width: 82px; text-align: right; color: var(--color-text-primary); }
+.row .val { font-size: 12px; font-weight: 500; min-width: 78px; text-align: right; color: var(--color-text-primary); }
+
+/* ── PDF button ── */
+.btn-pdf {
+  font-size: 12px; font-weight: 500; padding: 5px 14px;
+  border-radius: 6px; border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-primary); color: var(--color-text-secondary);
+  cursor: pointer; transition: all 0.15s; margin-left: auto; display: block;
+  margin-bottom: 10px;
+}
+.btn-pdf:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+.top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+
+/* ── Print styles ── */
+@media print {
+  .btn-pdf, .scenario-tabs, .scenario-info { display: none !important; }
+  .wrap { padding: 0; }
+  .two-col, .fin-grid { gap: 0 20px; }
+  .fot-block, .out-block, .section-block { background: #f7f7f7 !important; -webkit-print-color-adjust: exact; }
+  .metrics { break-inside: avoid; }
+  .bar-wrap, .status-bar { break-inside: avoid; }
+  input[type=range] { display: none !important; }
+  .row .val, .staff-row .val, .out-row .val { min-width: auto; }
+  .count-btns { display: none !important; }
+  .count-sub, .admin_sub, .clean_sub, .barista_sub { display: block; }
+  .vznosy-row input[type=range] { display: none !important; }
+  .usn-ctrl input[type=range] { display: none !important; }
+  h1.print-title { display: block !important; font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+}
+h1.print-title { display: none; }
 .cb-row { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--color-text-secondary); }
 .cb-row input { accent-color: #1D9E75; width: 13px; height: 13px; flex-shrink: 0; }
 .tag { font-size: 10px; padding: 1px 5px; border-radius: 4px; margin-left: 3px; background: #FAEEDA; color: #854F0B; }
-@media (prefers-color-scheme: dark) { .tag { background: #412402; color: #FAC775; } }
 
 /* ── FOT block ── */
-.fot-block { background: var(--color-background-secondary); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
-.block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.fot-block { background: var(--color-background-secondary); border-radius: 10px; padding: 11px 13px; margin-bottom: 8px; }
+.block-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .block-label { font-size: 10.5px; font-weight: 600; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.08em; }
 .block-total { font-size: 13px; font-weight: 700; color: var(--color-text-primary); }
 
 /* Count selector row */
-.count-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
-.count-row-label { font-size: 12.5px; color: var(--color-text-primary); flex: 1.3; min-width: 145px; }
+.count-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.count-row-label { font-size: 12px; color: var(--color-text-primary); flex: 1.3; min-width: 135px; }
 .count-btns { display: flex; gap: 4px; }
 .cbtn {
-  font-size: 12px; font-weight: 500; width: 34px; height: 26px;
+  font-size: 12px; font-weight: 500; width: 32px; height: 24px;
   border-radius: 5px; border: 0.5px solid var(--color-border-secondary);
   background: var(--color-background-primary); color: var(--color-text-primary);
   cursor: pointer; transition: all 0.15s;
 }
 .cbtn.active { background: #1D9E75; color: #fff; border-color: #1D9E75; font-weight: 700; }
-.count-sub { font-size: 12px; font-weight: 500; min-width: 82px; text-align: right; color: var(--color-text-secondary); }
+.count-sub { font-size: 12px; font-weight: 500; min-width: 78px; text-align: right; color: var(--color-text-secondary); }
 
 /* Staff sub-row */
-.staff-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; padding-left: 10px; }
-.staff-row label { font-size: 12px; color: var(--color-text-secondary); flex: 1.3; min-width: 145px; }
-.badge { font-size: 10px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 4px; padding: 1px 5px; color: var(--color-text-tertiary); margin-left: 4px; white-space: nowrap; }
+.staff-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-left: 8px; }
+.staff-row label { font-size: 11.5px; color: var(--color-text-secondary); flex: 1.3; min-width: 135px; }
+.badge { font-size: 9.5px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: 4px; padding: 1px 4px; color: var(--color-text-tertiary); margin-left: 4px; white-space: nowrap; }
 .staff-row input[type=range] { flex: 1.4; accent-color: #378ADD; min-width: 0; }
-.staff-row .val { font-size: 12px; font-weight: 500; min-width: 82px; text-align: right; color: var(--color-text-secondary); }
+.staff-row .val { font-size: 11.5px; font-weight: 500; min-width: 78px; text-align: right; color: var(--color-text-secondary); }
 
-.fot-divider { height: 0.5px; background: var(--color-border-tertiary); margin: 8px 0; }
+.fot-divider { height: 0.5px; background: var(--color-border-tertiary); margin: 6px 0; }
 
 /* Vznosy row */
-.vznosy-row { display: flex; align-items: center; gap: 8px; padding: 8px 0 0; border-top: 0.5px solid var(--color-border-tertiary); }
-.vznosy-label { font-size: 12px; color: var(--color-text-secondary); flex: 1; }
+.vznosy-row { display: flex; align-items: center; gap: 8px; padding: 6px 0 0; border-top: 0.5px solid var(--color-border-tertiary); }
+.vznosy-label { font-size: 11.5px; color: var(--color-text-secondary); flex: 1; }
 .pct-ctrl { display: flex; align-items: center; gap: 5px; }
-.pct-ctrl input[type=range] { width: 72px; accent-color: #EF9F27; }
-.pct-val-orange { font-size: 12px; font-weight: 600; color: #EF9F27; min-width: 30px; }
-.vznosy-amount { font-size: 12px; font-weight: 500; min-width: 82px; text-align: right; color: var(--color-text-secondary); }
+.pct-ctrl input[type=range] { width: 68px; accent-color: #EF9F27; }
+.pct-val-orange { font-size: 12px; font-weight: 600; color: #EF9F27; min-width: 28px; }
+.vznosy-amount { font-size: 11.5px; font-weight: 500; min-width: 78px; text-align: right; color: var(--color-text-secondary); }
 
-.fot-footer { display: flex; justify-content: space-between; align-items: flex-start; padding-top: 8px; margin-top: 6px; border-top: 0.5px solid var(--color-border-secondary); }
-.fot-footer-left { font-size: 12px; color: var(--color-text-secondary); }
-.fot-footer-note { font-size: 11px; color: var(--color-text-tertiary); margin-top: 2px; }
+.fot-footer { display: flex; justify-content: space-between; align-items: flex-start; padding-top: 6px; margin-top: 5px; border-top: 0.5px solid var(--color-border-secondary); }
+.fot-footer-left { font-size: 11.5px; color: var(--color-text-secondary); }
+.fot-footer-note { font-size: 10.5px; color: var(--color-text-tertiary); margin-top: 2px; }
 .fot-footer-val { font-size: 13px; font-weight: 700; color: var(--color-text-primary); }
 
 /* Outsourcing block */
-.out-block { background: var(--color-background-secondary); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
-.out-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.out-row label { font-size: 12px; color: var(--color-text-secondary); flex: 1.3; min-width: 145px; }
+.out-block { background: var(--color-background-secondary); border-radius: 10px; padding: 11px 13px; margin-bottom: 8px; }
+.out-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.out-row label { font-size: 11.5px; color: var(--color-text-secondary); flex: 1.3; min-width: 135px; }
 .out-row input[type=range] { flex: 1.4; accent-color: #888780; min-width: 0; }
-.out-row .val { font-size: 12px; font-weight: 500; min-width: 82px; text-align: right; color: var(--color-text-secondary); }
+.out-row .val { font-size: 11.5px; font-weight: 500; min-width: 78px; text-align: right; color: var(--color-text-secondary); }
 
 /* ── Metrics ── */
 .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 10px; margin: 20px 0 16px; }
@@ -114,14 +175,19 @@
 .status-bar.profit { background: #E1F5EE; color: #0F6E56; }
 .status-bar.loss { background: #FCEBEB; color: #A32D2D; }
 .status-bar.breakeven { background: #FAEEDA; color: #854F0B; }
-@media (prefers-color-scheme: dark) {
-  .status-bar.profit { background: #04342C; color: #5DCAA5; }
-  .status-bar.loss { background: #501313; color: #F09595; }
-  .status-bar.breakeven { background: #412402; color: #FAC775; }
-}
 </style>
+</head>
+<body>
+<div class="container">
 
 <div class="wrap">
+
+<h1 class="print-title">АРЕНА 8×8 — Финансовая модель</h1>
+
+<div class="top-bar">
+  <div></div>
+  <button class="btn-pdf" onclick="window.print()">⬇ Сохранить PDF</button>
+</div>
 
 <!-- СЦЕНАРИИ -->
 <div class="scenario-tabs">
@@ -130,7 +196,7 @@
   <button class="stab" onclick="setScenario('opt',this)">Оптимум</button>
 </div>
 <div class="scenario-info" id="scenario_info">
-  <strong>База</strong> — стабильный режим. Лиги (850 тыс.) + 1 школа (320 тыс.) + разовая аренда (160 тыс.) + кафе (200 тыс.). 2 администратора. Все аутсорс-контракты действуют.
+  <strong>База</strong> — лиги (1.03 млн) и школы (640к) как в минимуме + заполнение дневного блока 10-16 на ~50% (тренировки/товарищеские/школа малышей — 500к) + турниры лиги (150к), школ (100к), корпоративы (250к). Кафе 400к оборот (COGS 42%). ВИП-ложи 2× на ивентах (300к). 2 администратора.
 </div>
 
 <div class="two-col">
@@ -139,50 +205,93 @@
 <div>
   <div class="section-title">Доходы — ₽/мес</div>
 
-  <div class="row">
-    <label>Лиги — гарантия (договор)</label>
-    <input type="range" min="0" max="1200000" step="10000" value="850000" id="r_liga" oninput="calc()">
-    <span class="val" id="v_liga"></span>
+  <!-- Блок 1: Гарантированные -->
+  <div class="section-block">
+    <div class="block-header">
+      <span class="block-label">🔒 Гарантированные по договору</span>
+      <span class="block-total" id="inc_g_total"></span>
+    </div>
+    <div class="row">
+      <label>Лиги<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">пн–пт 20–23 + сб–вс 9–23 · 6 000 ₽/ч</span></label>
+      <input type="range" min="0" max="3000000" step="10000" value="1032000" id="r_liga" oninput="calc()">
+      <span class="val" id="v_liga"></span>
+    </div>
+    <div class="row">
+      <label>Школы<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">пн–пт 16–20 · 8 000–10 000 ₽/ч</span></label>
+      <input type="range" min="0" max="2500000" step="10000" value="640000" id="r_schools" oninput="calc()">
+      <span class="val" id="v_schools"></span>
+    </div>
   </div>
-  <div class="row">
-    <label>Детские школы</label>
-    <input type="range" min="0" max="800000" step="10000" value="320000" id="r_schools" oninput="calc()">
-    <span class="val" id="v_schools"></span>
+
+  <!-- Блок 2: Разовые / переменные -->
+  <div class="section-block">
+    <div class="block-header">
+      <span class="block-label">📅 Разовые / переменные</span>
+      <span class="block-total" id="inc_v_total"></span>
+    </div>
+    <div class="row">
+      <label>Тренировки / товарищеские<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">блок 10–16 · ~10 000 ₽/час · вкл. школу малышей</span></label>
+      <input type="range" min="0" max="1200000" step="10000" value="500000" id="r_train" oninput="calc()">
+      <span class="val" id="v_train"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_day_rent" onchange="calc()">Стадион на день</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">150–250 тыс./событие</span></label>
+      <input type="range" min="0" max="700000" step="10000" value="200000" id="r_day_rent" oninput="calc()">
+      <span class="val" id="v_day_rent"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_tourn" onchange="calc()" checked>Турниры лиги</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">наша лига · спонсорские · межкомандные</span></label>
+      <input type="range" min="0" max="800000" step="10000" value="150000" id="r_tourn" oninput="calc()">
+      <span class="val" id="v_tourn"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_tourn_sch" onchange="calc()" checked>Турниры школ</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">межшкольные кубки · первенства</span></label>
+      <input type="range" min="0" max="500000" step="10000" value="100000" id="r_tourn_sch" oninput="calc()">
+      <span class="val" id="v_tourn_sch"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_corp" onchange="calc()" checked>Корпоративы</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">корп. матчи · тимбилдинги · внешние турниры</span></label>
+      <input type="range" min="0" max="1000000" step="10000" value="250000" id="r_corp" oninput="calc()">
+      <span class="val" id="v_corp"></span>
+    </div>
   </div>
-  <div class="row">
-    <label>Разовая аренда + корпораты</label>
-    <input type="range" min="0" max="400000" step="10000" value="160000" id="r_rent" oninput="calc()">
-    <span class="val" id="v_rent"></span>
-  </div>
-  <div class="row">
-    <label>Турниры</label>
-    <input type="range" min="0" max="400000" step="10000" value="0" id="r_tourn" oninput="calc()">
-    <span class="val" id="v_tourn"></span>
-  </div>
-  <div class="row">
-    <label><span class="cb-row"><input type="checkbox" id="cb_cafe" onchange="calc()" checked>Кафе</span></label>
-    <input type="range" min="0" max="400000" step="10000" value="200000" id="r_cafe" oninput="calc()">
-    <span class="val" id="v_cafe"></span>
-  </div>
-  <div class="row">
-    <label><span class="cb-row"><input type="checkbox" id="cb_vip" onchange="calc()">ВИП-ложи</span></label>
-    <input type="range" min="0" max="200000" step="5000" value="80000" id="r_vip" oninput="calc()">
-    <span class="val" id="v_vip"></span>
-  </div>
-  <div class="row">
-    <label><span class="cb-row"><input type="checkbox" id="cb_spaces" onchange="calc()">Аренда помещений</span></label>
-    <input type="range" min="0" max="200000" step="5000" value="80000" id="r_spaces" oninput="calc()">
-    <span class="val" id="v_spaces"></span>
-  </div>
-  <div class="row">
-    <label><span class="cb-row"><input type="checkbox" id="cb_ads" onchange="calc()">Реклама / баннеры</span><span class="tag">обсуждается</span></label>
-    <input type="range" min="0" max="200000" step="5000" value="100000" id="r_ads" oninput="calc()">
-    <span class="val" id="v_ads"></span>
-  </div>
-  <div class="row">
-    <label><span class="cb-row"><input type="checkbox" id="cb_naming" onchange="calc()">Нейминг / спонсорство</span><span class="tag">обсуждается</span></label>
-    <input type="range" min="0" max="150000" step="5000" value="50000" id="r_naming" oninput="calc()">
-    <span class="val" id="v_naming"></span>
+
+  <!-- Блок 3: Дополнительно -->
+  <div class="section-block">
+    <div class="block-header">
+      <span class="block-label">➕ Дополнительно</span>
+      <span class="block-total" id="inc_a_total"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_cafe" onchange="calc()" checked>Кафе — оборот</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">спорт-буфет: кофе/хот-доги/снеки/выпечка</span></label>
+      <input type="range" min="0" max="1500000" step="10000" value="400000" id="r_cafe" oninput="calc()">
+      <span class="val" id="v_cafe"></span>
+    </div>
+    <div class="row" id="cafe_cogs_row">
+      <label style="font-size:11.5px;color:var(--color-text-secondary);padding-left:19px">└ Себестоимость (COGS)<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">закуп: кофе ~25%, хот-доги ~45%, снеки ~55%</span></label>
+      <input type="range" min="20" max="70" step="1" value="42" id="r_cafe_cogs" oninput="calc()">
+      <span class="val" id="v_cafe_cogs"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_vip" onchange="calc()" checked>ВИП-ложи</span><span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px;margin-left:19px">2 ложи · аренда на ивенты</span></label>
+      <input type="range" min="0" max="600000" step="10000" value="300000" id="r_vip" oninput="calc()">
+      <span class="val" id="v_vip"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_spaces" onchange="calc()">Аренда помещений</span></label>
+      <input type="range" min="0" max="500000" step="10000" value="80000" id="r_spaces" oninput="calc()">
+      <span class="val" id="v_spaces"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_ads" onchange="calc()">Реклама / баннеры</span><span class="tag">обсуждается</span></label>
+      <input type="range" min="0" max="600000" step="10000" value="100000" id="r_ads" oninput="calc()">
+      <span class="val" id="v_ads"></span>
+    </div>
+    <div class="row">
+      <label><span class="cb-row"><input type="checkbox" id="cb_naming" onchange="calc()">Нейминг / спонсорство</span><span class="tag">обсуждается</span></label>
+      <input type="range" min="0" max="1500000" step="10000" value="200000" id="r_naming" oninput="calc()">
+      <span class="val" id="v_naming"></span>
+    </div>
   </div>
 </div>
 
@@ -209,7 +318,7 @@
     </div>
     <div class="staff-row">
       <label>Ставка одного администратора</label>
-      <input type="range" min="0" max="120000" step="5000" value="70000" id="e_admin_rate" oninput="calc()">
+      <input type="range" min="0" max="120000" step="5000" value="90000" id="e_admin_rate" oninput="calc()">
       <span class="val" id="ve_admin_rate"></span>
     </div>
 
@@ -226,7 +335,7 @@
     </div>
     <div class="staff-row">
       <label>Ставка одной уборщицы</label>
-      <input type="range" min="0" max="100000" step="2000" value="60000" id="e_clean_rate" oninput="calc()">
+      <input type="range" min="0" max="100000" step="2000" value="65000" id="e_clean_rate" oninput="calc()">
       <span class="val" id="ve_clean_rate"></span>
     </div>
 
@@ -235,7 +344,7 @@
     <!-- АХО -->
     <div class="staff-row" style="padding-left:0;">
       <label style="font-size:12.5px;color:var(--color-text-primary);">АХО / Комендант<span class="badge">1 чел.</span></label>
-      <input type="range" min="0" max="120000" step="5000" value="60000" id="e_aho" oninput="calc()">
+      <input type="range" min="0" max="120000" step="5000" value="90000" id="e_aho" oninput="calc()">
       <span class="val" id="ve_aho" style="font-size:12.5px;color:var(--color-text-primary);"></span>
     </div>
 
@@ -252,7 +361,7 @@
     </div>
     <div class="staff-row">
       <label>Ставка одного бариста</label>
-      <input type="range" min="0" max="120000" step="5000" value="70000" id="e_barista_rate" oninput="calc()">
+      <input type="range" min="0" max="120000" step="5000" value="75000" id="e_barista_rate" oninput="calc()">
       <span class="val" id="ve_barista_rate"></span>
     </div>
 
@@ -260,7 +369,7 @@
     <div class="vznosy-row">
       <span class="vznosy-label">Взносы работодателя (ТК РФ)</span>
       <div class="pct-ctrl">
-        <input type="range" min="0" max="35" step="0.5" value="15" id="e_vznosy_pct" oninput="calc()">
+        <input type="range" min="0" max="35" step="0.5" value="30" id="e_vznosy_pct" oninput="calc()">
         <span class="pct-val-orange" id="vznosy_pct_val"></span>
       </div>
       <span class="vznosy-amount" id="vznosy_amt"></span>
@@ -304,55 +413,66 @@
   </div>
 
   <!-- Операционные -->
-  <div class="sub-title">Операционные расходы</div>
-  <div class="row">
-    <label>Электроэнергия</label>
-    <input type="range" min="0" max="200000" step="10000" value="140000" id="e_elec" oninput="calc()">
-    <span class="val" id="ve_elec"></span>
-  </div>
-  <div class="row">
-    <label>Коммуналка (вода, тепло)</label>
-    <input type="range" min="0" max="80000" step="5000" value="40000" id="e_util" oninput="calc()">
-    <span class="val" id="ve_util"></span>
-  </div>
-  <div class="row">
-    <label>Расходники и инвентарь</label>
-    <input type="range" min="0" max="100000" step="5000" value="55000" id="e_inv" oninput="calc()">
-    <span class="val" id="ve_inv"></span>
-  </div>
-  <div class="row">
-    <label>Маркетинг</label>
-    <input type="range" min="0" max="150000" step="5000" value="70000" id="e_mkt" oninput="calc()">
-    <span class="val" id="ve_mkt"></span>
-  </div>
-  <div class="row">
-    <label>Бухгалтерия / юрист</label>
-    <input type="range" min="0" max="80000" step="5000" value="40000" id="e_buh" oninput="calc()">
-    <span class="val" id="ve_buh"></span>
-  </div>
-  <div class="row">
-    <label>Прочие расходы</label>
-    <input type="range" min="0" max="80000" step="5000" value="25000" id="e_misc" oninput="calc()">
-    <span class="val" id="ve_misc"></span>
+  <div class="section-block">
+    <div class="block-header">
+      <span class="block-label">⚙️ Операционные расходы</span>
+      <span class="block-total" id="ops_total_display"></span>
+    </div>
+    <div class="row">
+      <label>Электроэнергия</label>
+      <input type="range" min="0" max="300000" step="10000" value="140000" id="e_elec" oninput="calc()">
+      <span class="val" id="ve_elec"></span>
+    </div>
+    <div class="row">
+      <label>Коммуналка (вода, тепло)</label>
+      <input type="range" min="0" max="80000" step="5000" value="40000" id="e_util" oninput="calc()">
+      <span class="val" id="ve_util"></span>
+    </div>
+    <div class="row">
+      <label>Расходники и инвентарь</label>
+      <input type="range" min="0" max="100000" step="5000" value="55000" id="e_inv" oninput="calc()">
+      <span class="val" id="ve_inv"></span>
+    </div>
+    <div class="row">
+      <label>Маркетинг</label>
+      <input type="range" min="0" max="200000" step="5000" value="70000" id="e_mkt" oninput="calc()">
+      <span class="val" id="ve_mkt"></span>
+    </div>
+    <div class="row">
+      <label>Бухгалтерия / юрист</label>
+      <input type="range" min="0" max="80000" step="5000" value="40000" id="e_buh" oninput="calc()">
+      <span class="val" id="ve_buh"></span>
+    </div>
+    <div class="row">
+      <label>Прочие расходы</label>
+      <input type="range" min="0" max="80000" step="5000" value="25000" id="e_misc" oninput="calc()">
+      <span class="val" id="ve_misc"></span>
+    </div>
   </div>
 
-  <!-- Финансовые -->
-  <div class="sub-title">Финансовые расходы</div>
-  <div class="row">
-    <label>Аренда земли</label>
-    <input type="range" min="0" max="400000" step="10000" value="0" id="e_land" oninput="calc()">
-    <span class="val" id="ve_land"></span>
+  <!-- Финансовые расходы -->
+  <div class="section-block">
+    <div class="block-header">
+      <span class="block-label">💰 Финансовые расходы</span>
+      <span class="block-total" id="fin_total_display"></span>
+    </div>
+    <div class="row">
+      <label>Аренда земли</label>
+      <input type="range" min="0" max="400000" step="1000" value="57000" id="e_land" oninput="calc()">
+      <span class="val" id="ve_land"></span>
+    </div>
+    <div class="row">
+      <label>Амортизация<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">не уменьшает базу УСН</span></label>
+      <input type="range" min="0" max="150000" step="5000" value="40000" id="e_amor" oninput="calc()">
+      <span class="val" id="ve_amor"></span>
+    </div>
+    <div class="row">
+      <label>Обслуживание кредита<span style="font-size:10.5px;color:var(--color-text-tertiary);display:block;margin-top:1px">проценты по займу</span></label>
+      <input type="range" min="0" max="200000" step="5000" value="80000" id="e_loan" oninput="calc()">
+      <span class="val" id="ve_loan"></span>
+    </div>
   </div>
-  <div class="row">
-    <label>Амортизация</label>
-    <input type="range" min="0" max="150000" step="5000" value="40000" id="e_amor" oninput="calc()">
-    <span class="val" id="ve_amor"></span>
-  </div>
-  <div class="row">
-    <label>Обслуживание кредита</label>
-    <input type="range" min="0" max="200000" step="5000" value="80000" id="e_loan" oninput="calc()">
-    <span class="val" id="ve_loan"></span>
-  </div>
+
 </div>
 </div><!-- /two-col -->
 
@@ -370,9 +490,10 @@
   </div>
   <div class="metric neutral">
     <div class="mlabel">
-      Налог УСН&nbsp;<span class="usn-ctrl"><input type="range" min="0" max="20" step="1" value="10" id="e_usn_pct" oninput="calc()"><span class="usn-pct-val" id="usn_pct_display"></span></span>
+      Налог УСН (Д−Р)&nbsp;<span class="usn-ctrl"><input type="range" min="0" max="20" step="1" value="15" id="e_usn_pct" oninput="calc()"><span class="usn-pct-val" id="usn_pct_display"></span></span>
     </div>
     <div class="mval" id="m_tax"></div>
+    <div style="font-size:10px;color:var(--color-text-tertiary);margin-top:3px" id="m_tax_note"></div>
   </div>
   <div class="metric good">
     <div class="mlabel">Чистая прибыль</div>
@@ -386,18 +507,23 @@
     <div class="mlabel">Маржинальность</div>
     <div class="mval" id="m_margin"></div>
   </div>
+  <div class="metric neutral" id="m_vat_card">
+    <div class="mlabel">Годовая выручка <span class="tag" id="m_vat_tag">УСН без НДС</span></div>
+    <div class="mval" id="m_annual"></div>
+    <div style="font-size:10px;color:var(--color-text-tertiary);margin-top:3px" id="m_vat_note"></div>
+  </div>
 </div>
 
 <!-- BAR CHART -->
 <div class="bar-wrap">
   <div class="section-title" style="margin-top:0">Структура доходов vs. расходы</div>
-  <div class="bar-row"><span class="blabel">Лиги (договор)</span><div class="bar" id="b_liga" style="background:#1D9E75;width:2px"></div><span class="bval" id="bv_liga"></span></div>
+  <div class="bar-row"><span class="blabel">Лиги</span><div class="bar" id="b_liga" style="background:#1D9E75;width:2px"></div><span class="bval" id="bv_liga"></span></div>
   <div class="bar-row"><span class="blabel">Школы</span><div class="bar" id="b_schools" style="background:#378ADD;width:2px"></div><span class="bval" id="bv_schools"></span></div>
-  <div class="bar-row"><span class="blabel">Аренда + корп.</span><div class="bar" id="b_rent" style="background:#534AB7;width:2px"></div><span class="bval" id="bv_rent"></span></div>
-  <div class="bar-row"><span class="blabel">Турниры</span><div class="bar" id="b_tourn" style="background:#5DCAA5;width:2px"></div><span class="bval" id="bv_tourn"></span></div>
+  <div class="bar-row"><span class="blabel">Тренировки / разовые</span><div class="bar" id="b_train" style="background:#534AB7;width:2px"></div><span class="bval" id="bv_train"></span></div>
+  <div class="bar-row"><span class="blabel">Стадион на день</span><div class="bar" id="b_day_rent" style="background:#5DCAA5;width:2px"></div><span class="bval" id="bv_day_rent"></span></div>
+  <div class="bar-row"><span class="blabel">Турниры + корпоративы</span><div class="bar" id="b_tourn" style="background:#9B8DE8;width:2px"></div><span class="bval" id="bv_tourn"></span></div>
   <div class="bar-row"><span class="blabel">Кафе</span><div class="bar" id="b_cafe" style="background:#EF9F27;width:2px"></div><span class="bval" id="bv_cafe"></span></div>
-  <div class="bar-row"><span class="blabel">ВИП-ложи</span><div class="bar" id="b_vip" style="background:#D4537E;width:2px"></div><span class="bval" id="bv_vip"></span></div>
-  <div class="bar-row"><span class="blabel">Помещения</span><div class="bar" id="b_spaces" style="background:#888780;width:2px"></div><span class="bval" id="bv_spaces"></span></div>
+  <div class="bar-row"><span class="blabel">ВИП / помещения</span><div class="bar" id="b_vip" style="background:#D4537E;width:2px"></div><span class="bval" id="bv_vip"></span></div>
   <div class="bar-row"><span class="blabel">Реклама / нейминг</span><div class="bar" id="b_ads" style="background:#D85A30;width:2px"></div><span class="bval" id="bv_ads"></span></div>
   <div class="bar-row" style="margin-top:6px">
     <span class="blabel" style="font-weight:600;color:var(--color-text-primary)">Порог (расходы)</span>
@@ -408,6 +534,7 @@
 
 <div class="status-bar profit" id="status_bar"> </div>
 
+</div>
 </div>
 
 <script>
@@ -444,15 +571,20 @@ function syncCountBtns(type, n) {
 // ── Main calculation ──
 function calc() {
   // Income
-  var liga    = gv('r_liga');
-  var schools = gv('r_schools');
-  var rent    = gv('r_rent');
-  var tourn   = gv('r_tourn');
-  var cafe    = gc('cb_cafe')    ? gv('r_cafe')    : 0;
-  var vip     = gc('cb_vip')     ? gv('r_vip')     : 0;
-  var spaces  = gc('cb_spaces')  ? gv('r_spaces')  : 0;
-  var ads     = gc('cb_ads')     ? gv('r_ads')     : 0;
-  var naming  = gc('cb_naming')  ? gv('r_naming')  : 0;
+  var liga     = gv('r_liga');
+  var schools  = gv('r_schools');
+  var train    = gv('r_train');
+  var day_rent = gc('cb_day_rent') ? gv('r_day_rent') : 0;
+  var tourn    = gc('cb_tourn')    ? gv('r_tourn')    : 0;
+  var tournSch = gc('cb_tourn_sch')? gv('r_tourn_sch'): 0;
+  var corp     = gc('cb_corp')     ? gv('r_corp')     : 0;
+  var cafe     = gc('cb_cafe')     ? gv('r_cafe')     : 0;
+  var cafeCogsPct = gv('r_cafe_cogs');
+  var cafeCogs    = gc('cb_cafe') ? Math.round(cafe * cafeCogsPct / 100) : 0;
+  var vip      = gc('cb_vip')      ? gv('r_vip')      : 0;
+  var spaces   = gc('cb_spaces')   ? gv('r_spaces')   : 0;
+  var ads      = gc('cb_ads')      ? gv('r_ads')       : 0;
+  var naming   = gc('cb_naming')   ? gv('r_naming')   : 0;
 
   // FOT salaries
   var adminRate   = gv('e_admin_rate');
@@ -515,32 +647,76 @@ function calc() {
   st('ve_land', fmt(land)); st('ve_amor', fmt(amor)); st('ve_loan', fmt(loan));
 
   // ── Update income ──
-  st('v_liga',    fmt(liga));
-  st('v_schools', fmt(schools));
-  st('v_rent',    fmt(rent));
-  st('v_tourn',   fmt(tourn));
-  st('v_cafe',    gc('cb_cafe')    ? fmt(gv('r_cafe'))    : '—');
-  st('v_vip',     gc('cb_vip')     ? fmt(gv('r_vip'))     : '—');
-  st('v_spaces',  gc('cb_spaces')  ? fmt(gv('r_spaces'))  : '—');
-  st('v_ads',     gc('cb_ads')     ? fmt(gv('r_ads'))     : '—');
-  st('v_naming',  gc('cb_naming')  ? fmt(gv('r_naming'))  : '—');
+  st('v_liga',     fmt(liga));
+  st('v_schools',  fmt(schools));
+  st('v_train',    fmt(train));
+  st('v_day_rent', gc('cb_day_rent') ? fmt(gv('r_day_rent')) : '—');
+  st('v_tourn',    gc('cb_tourn')    ? fmt(gv('r_tourn'))    : '—');
+  st('v_tourn_sch',gc('cb_tourn_sch')? fmt(gv('r_tourn_sch')): '—');
+  st('v_corp',     gc('cb_corp')     ? fmt(gv('r_corp'))     : '—');
+  st('v_cafe',     gc('cb_cafe')     ? fmt(gv('r_cafe'))     : '—');
+  st('v_cafe_cogs', gc('cb_cafe')    ? cafeCogsPct + '% (' + fmt(cafeCogs) + ')' : '—');
+  st('v_vip',      gc('cb_vip')      ? fmt(gv('r_vip'))      : '—');
+  st('v_spaces',   gc('cb_spaces')   ? fmt(gv('r_spaces'))   : '—');
+  st('v_ads',      gc('cb_ads')      ? fmt(gv('r_ads'))      : '—');
+  st('v_naming',   gc('cb_naming')   ? fmt(gv('r_naming'))   : '—');
 
   // ── USN display ──
   st('usn_pct_display', usnPct + '%');
 
+  // ── Block totals ──
+  var incGuaranteed = liga + schools;
+  var incVariable   = train + day_rent + tourn + tournSch + corp;
+  var incAdditional = cafe + vip + spaces + ads + naming;
+  var opsTotal      = elec + util + inv + mkt + buh + misc;
+  var finTotal      = land + amor + loan;
+  st('inc_g_total',     fmt(incGuaranteed) + ' ₽');
+  st('inc_v_total',     fmt(incVariable)   + ' ₽');
+  st('inc_a_total',     fmt(incAdditional) + ' ₽');
+  st('ops_total_display', fmt(opsTotal)    + ' ₽');
+  st('fin_total_display', fmt(finTotal)    + ' ₽');
+
   // ── P&L ──
-  var income  = liga + schools + rent + tourn + cafe + vip + spaces + ads + naming;
-  var costs   = fotTotal + outTotal + elec + util + inv + mkt + buh + misc + land + amor + loan;
-  var taxBase = income - costs;
+  var income  = liga + schools + train + day_rent + tourn + tournSch + corp + cafe + vip + spaces + ads + naming;
+  var costs   = fotTotal + outTotal + cafeCogs + elec + util + inv + mkt + buh + misc + land + amor + loan;
+  // Налоговая база УСН Д−Р: амортизация исключается (на УСН не списывается)
+  var taxableCosts = costs - amor;
+  var taxBase = income - taxableCosts;
   var tax     = taxBase > 0 ? Math.round(taxBase * usnPct / 100) : 0;
-  var profit  = taxBase - tax;
+  var profit  = income - costs - tax;
   var margin  = income > 0 ? Math.round(profit / income * 100) : 0;
 
   st('m_income', fmt(income) + ' ₽');
   st('m_costs',  fmt(costs)  + ' ₽');
   st('m_tax',    fmt(tax)    + ' ₽');
+  st('m_tax_note', 'база: ' + fmt(Math.max(0,taxBase)) + ' ₽ (расходы без амортизации)');
   st('m_be',     fmt(costs)  + ' ₽');
   st('m_margin', margin      + '%');
+
+  // ── Годовая выручка vs лимит НДС (ФЗ-176, порог 60 млн/год) ──
+  var annual    = income * 12;
+  var vatLimit  = 60000000;
+  var vatLimit2 = 250000000; // граница ставки 5%
+  st('m_annual', fmt(annual) + ' ₽');
+  var vatCard = document.getElementById('m_vat_card');
+  var vatTag  = document.getElementById('m_vat_tag');
+  if (annual <= vatLimit * 0.7) {
+    vatCard.className = 'metric good';
+    vatTag.textContent = 'УСН без НДС';
+    st('m_vat_note', 'до лимита ' + fmt(vatLimit - annual) + ' ₽ (60 млн)');
+  } else if (annual <= vatLimit) {
+    vatCard.className = 'metric neutral';
+    vatTag.textContent = 'УСН без НДС (близко к лимиту)';
+    st('m_vat_note', 'до лимита ' + fmt(vatLimit - annual) + ' ₽ — следить');
+  } else if (annual <= vatLimit2) {
+    vatCard.className = 'metric bad';
+    vatTag.textContent = 'НДС 5% или 20%';
+    st('m_vat_note', 'превышен лимит 60 млн — НДС обязателен (5% без вычетов / 20% с вычетами)');
+  } else {
+    vatCard.className = 'metric bad';
+    vatTag.textContent = 'НДС 7% или 20%';
+    st('m_vat_note', 'выручка > 250 млн — ставка 5% недоступна');
+  }
 
   var pm = document.getElementById('m_profit');
   pm.textContent = (profit >= 0 ? '+' : '') + fmt(profit) + ' ₽';
@@ -562,11 +738,15 @@ function calc() {
   var maxW   = 200;
   var maxVal = Math.max(income, costs, 1);
   var bars = [
-    ['b_liga','bv_liga',liga], ['b_schools','bv_schools',schools],
-    ['b_rent','bv_rent',rent], ['b_tourn','bv_tourn',tourn],
-    ['b_cafe','bv_cafe',cafe], ['b_vip','bv_vip',vip],
-    ['b_spaces','bv_spaces',spaces], ['b_ads','bv_ads',ads+naming],
-    ['b_be','bv_be',costs]
+    ['b_liga',     'bv_liga',     liga],
+    ['b_schools',  'bv_schools',  schools],
+    ['b_train',    'bv_train',    train],
+    ['b_day_rent', 'bv_day_rent', day_rent],
+    ['b_tourn',    'bv_tourn',    tourn + tournSch + corp],
+    ['b_cafe',     'bv_cafe',     cafe],
+    ['b_vip',      'bv_vip',      vip + spaces],
+    ['b_ads',      'bv_ads',      ads + naming],
+    ['b_be',       'bv_be',       costs]
   ];
   bars.forEach(function(item) {
     var b = document.getElementById(item[0]);
@@ -578,9 +758,9 @@ function calc() {
 
 // ── Scenario presets ──
 var SCENARIO_TEXTS = {
-  min:  '<strong>Минимум</strong> — начальный период или низкий сезон. Работают только лиги (850 тыс./мес). Кафе не открыто, школы и аренда ещё не запущены. 2 администратора. Операционные расходы — минимальные.',
-  base: '<strong>База</strong> — стабильный режим. Лиги (850 тыс.) + 1 школа (320 тыс.) + разовая аренда (160 тыс.) + кафе (200 тыс.). 2 администратора. Все аутсорс-контракты действуют.',
-  opt:  '<strong>Оптимум</strong> — полная загрузка, все 6 потоков. Лиги (1 млн) + школы (640 тыс.) + турниры (100 тыс.) + корпораты (300 тыс.) + кафе (325 тыс.) + ВИП-ложи + помещения + реклама + нейминг. 3 администратора.'
+  min:  '<strong>Минимум</strong> — стартовое ядро. Лиги (1.03 млн: пн–пт 20–23 + сб–вс 9–23 × 6 000 ₽/ч) + 1 школа (640 тыс.: пн–пт 16–20 × 8 000 ₽/ч) + кафе (200 тыс. оборот, COGS 42%). Дневной блок 10–16 не задействован. Турниры и доп. потоки выключены. 2 администратора.',
+  base: '<strong>База</strong> — лиги (1.03 млн) и школы (640к) как в минимуме + заполнение дневного блока 10-16 на ~50% (тренировки/товарищеские + школа малышей — 500к) + турниры лиги (150к), школ (100к), корпоративы (250к). Кафе 400к оборот (COGS 42%). ВИП-ложи на ивентах (300к). 2 администратора.',
+  opt:  '<strong>Оптимум</strong> — лиги/школы как в минимуме + дневной блок на ~80% (900к) + турниры лиги (300к), школ (200к) + корпоративы (700к) + стадион на день (200к) + кафе 700к + ВИП (600к) + помещения + реклама + нейминг. 3 администратора.'
 };
 
 function setScenario(s, el) {
@@ -590,42 +770,56 @@ function setScenario(s, el) {
   if (info) info.innerHTML = SCENARIO_TEXTS[s];
 
   if (s === 'min') {
-    sv('r_liga',850000); sv('r_schools',0);   sv('r_rent',0); sv('r_tourn',0);
-    sc('cb_cafe',false); sc('cb_vip',false); sc('cb_spaces',false); sc('cb_ads',false); sc('cb_naming',false);
-    syncCountBtns('admin',2); syncCountBtns('clean',2); syncCountBtns('barista',2);
-    sv('e_admin_rate',70000); sv('e_clean_rate',60000); sv('e_aho',60000); sv('e_barista_rate',70000);
-    sv('e_vznosy_pct',15); sv('e_usn_pct',10);
-    sv('e_guard',200000); sv('e_grass',110000); sv('e_eng',75000); sv('e_clean_out',50000);
-    sv('e_elec',100000); sv('e_util',30000); sv('e_inv',30000);
-    sv('e_mkt',30000); sv('e_buh',30000); sv('e_misc',15000);
-    sv('e_land',0); sv('e_amor',40000); sv('e_loan',80000);
-
-  } else if (s === 'base') {
-    sv('r_liga',850000); sv('r_schools',320000); sv('r_rent',160000); sv('r_tourn',0);
-    sc('cb_cafe',true); sv('r_cafe',200000);
+    sv('r_liga',1032000); sv('r_schools',640000); sv('r_train',0);
+    sc('cb_day_rent',false);
+    sc('cb_tourn',false); sv('r_tourn',150000);
+    sc('cb_tourn_sch',false); sv('r_tourn_sch',100000);
+    sc('cb_corp',false); sv('r_corp',150000);
+    sc('cb_cafe',true); sv('r_cafe',200000); sv('r_cafe_cogs',42);
     sc('cb_vip',false); sc('cb_spaces',false); sc('cb_ads',false); sc('cb_naming',false);
     syncCountBtns('admin',2); syncCountBtns('clean',2); syncCountBtns('barista',2);
-    sv('e_admin_rate',70000); sv('e_clean_rate',60000); sv('e_aho',60000); sv('e_barista_rate',70000);
-    sv('e_vznosy_pct',15); sv('e_usn_pct',10);
+    sv('e_admin_rate',90000); sv('e_clean_rate',65000); sv('e_aho',90000); sv('e_barista_rate',75000);
+    sv('e_vznosy_pct',30); sv('e_usn_pct',15);
     sv('e_guard',200000); sv('e_grass',110000); sv('e_eng',75000); sv('e_clean_out',50000);
     sv('e_elec',140000); sv('e_util',40000); sv('e_inv',55000);
-    sv('e_mkt',70000); sv('e_buh',40000); sv('e_misc',25000);
-    sv('e_land',0); sv('e_amor',40000); sv('e_loan',80000);
+    sv('e_mkt',50000); sv('e_buh',40000); sv('e_misc',25000);
+    sv('e_land',57000); sv('e_amor',40000); sv('e_loan',80000);
+
+  } else if (s === 'base') {
+    sv('r_liga',1032000); sv('r_schools',640000); sv('r_train',500000);
+    sc('cb_day_rent',false);
+    sc('cb_tourn',true); sv('r_tourn',150000);
+    sc('cb_tourn_sch',true); sv('r_tourn_sch',100000);
+    sc('cb_corp',true); sv('r_corp',250000);
+    sc('cb_cafe',true); sv('r_cafe',400000); sv('r_cafe_cogs',42);
+    sc('cb_vip',true); sv('r_vip',300000);
+    sc('cb_spaces',false); sc('cb_ads',false); sc('cb_naming',false);
+    syncCountBtns('admin',2); syncCountBtns('clean',2); syncCountBtns('barista',2);
+    sv('e_admin_rate',90000); sv('e_clean_rate',65000); sv('e_aho',90000); sv('e_barista_rate',75000);
+    sv('e_vznosy_pct',30); sv('e_usn_pct',15);
+    sv('e_guard',200000); sv('e_grass',110000); sv('e_eng',75000); sv('e_clean_out',50000);
+    sv('e_elec',170000); sv('e_util',45000); sv('e_inv',60000);
+    sv('e_mkt',80000); sv('e_buh',40000); sv('e_misc',25000);
+    sv('e_land',57000); sv('e_amor',40000); sv('e_loan',80000);
 
   } else {
-    sv('r_liga',1000000); sv('r_schools',640000); sv('r_rent',300000); sv('r_tourn',100000);
-    sc('cb_cafe',true); sv('r_cafe',325000);
-    sc('cb_vip',true);  sv('r_vip',80000);
-    sc('cb_spaces',true); sv('r_spaces',80000);
-    sc('cb_ads',true);  sv('r_ads',100000);
-    sc('cb_naming',true); sv('r_naming',50000);
+    sv('r_liga',1032000); sv('r_schools',640000); sv('r_train',900000);
+    sc('cb_day_rent',true); sv('r_day_rent',200000);
+    sc('cb_tourn',true); sv('r_tourn',300000);
+    sc('cb_tourn_sch',true); sv('r_tourn_sch',200000);
+    sc('cb_corp',true); sv('r_corp',700000);
+    sc('cb_cafe',true); sv('r_cafe',700000); sv('r_cafe_cogs',42);
+    sc('cb_vip',true); sv('r_vip',600000);
+    sc('cb_spaces',true); sv('r_spaces',100000);
+    sc('cb_ads',true); sv('r_ads',200000);
+    sc('cb_naming',true); sv('r_naming',200000);
     syncCountBtns('admin',3); syncCountBtns('clean',2); syncCountBtns('barista',2);
-    sv('e_admin_rate',70000); sv('e_clean_rate',60000); sv('e_aho',75000); sv('e_barista_rate',70000);
-    sv('e_vznosy_pct',15); sv('e_usn_pct',10);
+    sv('e_admin_rate',90000); sv('e_clean_rate',65000); sv('e_aho',90000); sv('e_barista_rate',75000);
+    sv('e_vznosy_pct',30); sv('e_usn_pct',15);
     sv('e_guard',200000); sv('e_grass',110000); sv('e_eng',75000); sv('e_clean_out',50000);
-    sv('e_elec',160000); sv('e_util',50000); sv('e_inv',70000);
-    sv('e_mkt',70000); sv('e_buh',50000); sv('e_misc',30000);
-    sv('e_land',0); sv('e_amor',40000); sv('e_loan',80000);
+    sv('e_elec',220000); sv('e_util',55000); sv('e_inv',80000);
+    sv('e_mkt',150000); sv('e_buh',50000); sv('e_misc',35000);
+    sv('e_land',57000); sv('e_amor',40000); sv('e_loan',80000);
   }
   calc();
 }
@@ -633,3 +827,6 @@ function setScenario(s, el) {
 // Initial render
 calc();
 </script>
+</body>
+</html>
+
